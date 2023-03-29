@@ -1,0 +1,13 @@
+{
+  "domain": "chore_helper",
+  "name": "Chore Helper",
+  "codeowners": [
+    "@bmcclure"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/bmcclure/ha-chore-helper",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/bmcclure/ha-chore-helper/issues",
+  "version": "1.0.0"
+}

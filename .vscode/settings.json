@@ -1,0 +1,14 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "files.associations": {
+        "*.yaml": "home-assistant"
+    },
+    "cSpell.words": [
+        "HACS",
+        "hass",
+        "hassfest",
+        "homeassistant",
+    ],
+}

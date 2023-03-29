@@ -1,0 +1,40 @@
+name: "Release"
+
+on:
+  release:
+    types:
+      - "published"
+
+env:
+  RELEASE_VERSION: ""
+
+jobs:
+  release:
+    name: "Release"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout the repository"
+        uses: "actions/checkout@v3.5.0"
+
+      - name: "Get version number from release tag"
+        shell: "bash"
+        run: |
+          echo "RELEASE_VERSION=$(echo '${{ github.event.release.tag_name }}' | sed s/v//)" >> $GITHUB_ENV
+
+      - name: "Adjust version number"
+        if: env.release_version != ''
+        shell: "bash"
+        run: |
+          yq -i -o json '.version="${{ env.RELEASE_VERSION }}"' \
+            "${{ github.workspace }}/custom_components/chore_helper/manifest.json"
+
+      - name: "ZIP the integration directory"
+        shell: "bash"
+        run: |
+          cd "${{ github.workspace }}/custom_components/chore_helper"
+          zip chore-helper.zip -r ./
+
+      - name: "Upload the ZIP file to the release"
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          files: ${{ github.workspace }}/custom_components/chore_helper/chore-helper.zip
