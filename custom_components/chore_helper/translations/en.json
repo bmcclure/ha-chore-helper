@@ -1,0 +1,98 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Chore (1/2)",
+                "description": "Enter the sensor name and configure sensor parameters. More info on https://github.com/bmcclure/ha-chore-helper",
+                "data": {
+                    "name": "Friendly name",
+                    "hidden": "Hide in calendar",
+                    "frequency": "Frequency",
+                    "manual_update": "Manual update - sensor state updated manually by a service (Blueprint)",
+                    "icon_normal": "Icon (mdi:broom) - optional",
+                    "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
+                    "icon_today": "Icon due today (mdi:bell) - optional"
+                }
+            },
+            "detail": {
+                "title": "Chore (2/2)",
+                "description": "More details here: https://github.com/bmcclure/ha-chore-helper",
+                "data": {
+                    "date": "Due date (mm/dd)",
+                    "entities": "List of entities (comma separated)",
+                    "chore_days": "Due day(s)",
+                    "first_month": "First due month",
+                    "last_month": "Last due month",
+                    "period": "Due every/after",
+                    "first_week": "First due week (1-52)",
+                    "first_date": "First due date",
+                    "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
+                    "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
+                    "date_format": "Date format (see http://strftime.org/)"
+                }
+            }
+        },
+        "error": {
+            "value": "Invalid value. Please check your input!",
+            "icon": "Icons should be specified in the form 'prefix:name'.",
+            "days": "Select 1 or more days!",
+            "entities": "Entity does not exist!",
+            "month_day": "Invalid date format!",
+            "time": "Invalid time format!",
+            "weekday_order_number": "Select 1 or more days",
+            "week_order_number": "Select 1 or more weeks",
+            "period": "Period must be a number between 1 and 1000",
+            "first_week": "First week must be a number between 1 and 52",
+            "date": "Invalid date format!"
+        },
+        "abort": {
+            "single_instance_allowed": "Only a single configuration of Chore Helper is allowed."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Chore (1/2)",
+                "description": "Change sensor parameters. More info on https://github.com/bmcclure/ha-chore-helper",
+                "data": {
+                    "hidden": "Hide in calendar",
+                    "frequency": "Frequency",
+                    "manual_update": "Manual update - sensor state updated manually by a service (Blueprint)",
+                    "icon_normal": "Icon (mdi:broom) - optional",
+                    "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
+                    "icon_today": "Icon due today (mdi:bell) - optional"
+                }
+            },
+            "detail": {
+                "title": "Chore (2/2)",
+                "description": "More details here: https://github.com/bmcclure/ha-chore-helper",
+                "data": {
+                    "date": "Due date (mm/dd)",
+                    "entities": "List of entities (comma separated)",
+                    "chore_days": "Due day(s)",
+                    "first_month": "First due month",
+                    "last_month": "Last due month",
+                    "period": "Due every/after",
+                    "first_week": "First due week (1-52)",
+                    "first_date": "First due date",
+                    "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
+                    "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
+                    "date_format": "Date format (see http://strftime.org/)"
+                }
+            }
+        },
+        "error": {
+            "value": "Invalid value. Please check your input!",
+            "icon": "Icons should be specified in the form 'prefix:name'.",
+            "days": "Select 1 or more days!",
+            "entities": "Entity does not exist!",
+            "month_day": "Invalid date format!",
+            "time": "Invalid time format!",
+            "weekday_order_number": "Select 1 or more days",
+            "week_order_number": "Select 1 or more weeks",
+            "period": "Period must be a number between 1 and 1000",
+            "first_week": "First week must be a number between 1 and 52",
+            "date": "Invalid date format!"
+        }
+    }
+}

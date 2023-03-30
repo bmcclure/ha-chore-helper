@@ -6,9 +6,11 @@
         "*.yaml": "home-assistant"
     },
     "cSpell.words": [
+        "dateutil",
         "HACS",
         "hass",
         "hassfest",
         "homeassistant",
+        "relativedelta"
     ],
 }
