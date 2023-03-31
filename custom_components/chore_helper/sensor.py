@@ -121,7 +121,7 @@ class Chore(RestoreEntity):
         self._attr_icon = self._icon_normal
 
     async def async_added_to_hass(self) -> None:
-        """When sensor is added to hassio, add it to calendar."""
+        """When sensor is added to HA, add it to calendar."""
         await super().async_added_to_hass()
         self.hass.data[const.DOMAIN][const.SENSOR_PLATFORM][self.entity_id] = self
 
@@ -173,7 +173,7 @@ class Chore(RestoreEntity):
             )
 
     async def async_will_remove_from_hass(self) -> None:
-        """When sensor is added to hassio, remove it."""
+        """When sensor is removed from HA, remove it."""
         await super().async_will_remove_from_hass()
         del self.hass.data[const.DOMAIN][const.SENSOR_PLATFORM][self.entity_id]
         self.hass.data[const.DOMAIN][const.CALENDAR_PLATFORM].remove_entity(
@@ -286,10 +286,8 @@ class Chore(RestoreEntity):
             return True
         try:
             if self._next_due_date == today and (
-
-                    isinstance(self.last_completed, datetime)
-                    and self.last_completed.date() == today
-
+                isinstance(self.last_completed, datetime)
+                and self.last_completed.date() == today
             ):
                 return True
         except (AttributeError, TypeError):
