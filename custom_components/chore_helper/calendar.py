@@ -14,10 +14,10 @@ from .const import CALENDAR_NAME, CALENDAR_PLATFORM, DOMAIN, SENSOR_PLATFORM
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=1)
 
 
+# pylint: disable=unused-argument
 async def async_setup_entry(
     _: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    # pylint: disable=unused-argument
     """Add calendar entity to HA."""
     async_add_entities([ChoreCalendar()], True)
 
@@ -82,8 +82,10 @@ class EntitiesCalendarData:
 
     def remove_entity(self, entity_id: str) -> None:
         """Remove entity ID from the calendar."""
-        if entity_id in self.entities:
+        try:
             self.entities.remove(entity_id)
+        except ValueError:
+            pass
 
     async def async_get_events(
         self, hass: HomeAssistant, start_datetime: datetime, end_datetime: datetime
