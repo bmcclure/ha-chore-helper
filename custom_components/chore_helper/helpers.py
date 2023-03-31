@@ -49,7 +49,7 @@ def dates_to_texts(dates: list[date]) -> list[str]:
 
 
 def time_text(value: Any) -> str:
-    """Have to store time as text - datetime is not JSON serialisable."""
+    """Have to store time as text - datetime is not JSON serializable."""
     if value is None or value == "":
         return ""
     try:
