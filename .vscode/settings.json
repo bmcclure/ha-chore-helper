@@ -6,6 +6,7 @@
         "*.yaml": "home-assistant"
     },
     "cSpell.words": [
+        "bmcclure",
         "dateutil",
         "HACS",
         "hass",
