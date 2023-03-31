@@ -13,7 +13,6 @@ import homeassistant.util.dt as dt_util
 from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    Platform,
     ATTR_HIDDEN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,

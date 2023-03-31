@@ -17,7 +17,8 @@ def now() -> datetime:
 
 def to_date(day: Any) -> date:
     """Convert datetime or text to date, if not already datetime.
-    Used for the first date for every_n_days (configured as text)
+
+    Used for the first date for every_n_days (configured as text).
     """
     if day is None:
         raise ValueError

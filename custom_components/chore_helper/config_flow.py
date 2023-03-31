@@ -3,7 +3,7 @@ from __future__ import annotations
 
 # import uuid
 from collections.abc import Mapping
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.const import ATTR_HIDDEN, CONF_NAME
@@ -33,7 +33,7 @@ async def _validate_config(
 
 
 def required(
-    key: str, options: Dict[str, Any], default: Any | None = None
+    key: str, options: dict[str, Any], default: Any | None = None
 ) -> vol.Required:
     """Return vol.Required."""
     if isinstance(options, dict) and key in options:
@@ -46,7 +46,7 @@ def required(
 
 
 def optional(
-    key: str, options: Dict[str, Any], default: Any | None = None
+    key: str, options: dict[str, Any], default: Any | None = None
 ) -> vol.Optional:
     """Return vol.Optional."""
     if isinstance(options, dict) and key in options:
@@ -115,7 +115,7 @@ async def detail_config_schema(
     handler: SchemaConfigFlowHandler | SchemaOptionsFlowHandler,
 ) -> vol.Schema:
     """Generate options schema."""
-    options_schema: Dict[vol.Optional | vol.Required, Any] = {}
+    options_schema: dict[vol.Optional | vol.Required, Any] = {}
     frequency = handler.options[const.CONF_FREQUENCY]
 
     if frequency not in const.BLANK_FREQUENCY:
@@ -219,13 +219,13 @@ async def choose_details_step(_: dict[str, Any]) -> str:
     return "detail"
 
 
-CONFIG_FLOW: Dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+CONFIG_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
     "user": SchemaFlowFormStep(general_config_schema, next_step=choose_details_step),
     "detail": SchemaFlowFormStep(
         detail_config_schema, validate_user_input=_validate_config
     ),
 }
-OPTIONS_FLOW: Dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+OPTIONS_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
     "init": SchemaFlowFormStep(general_options_schema, next_step=choose_details_step),
     "detail": SchemaFlowFormStep(
         detail_config_schema, validate_user_input=_validate_config
@@ -244,6 +244,7 @@ class ChoreHelperConfigFlowHandler(SchemaConfigFlowHandler, domain=const.DOMAIN)
     @callback
     def async_config_entry_title(self, options: Mapping[str, Any]) -> str:
         """Return config entry title.
+
         The options parameter contains config entry options, which is the union of user
         input from the config flow steps.
         """

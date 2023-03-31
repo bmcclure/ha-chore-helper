@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta
-from typing import Any, Dict, Generator
+from typing import Any
+from collections.abc import Generator
 
 from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
@@ -231,7 +232,7 @@ class Chore(RestoreEntity):
         return self._attr_icon
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
         state_attr = {
             const.ATTR_DAYS: self._days,
@@ -285,10 +286,10 @@ class Chore(RestoreEntity):
             return True
         try:
             if self._next_due_date == today and (
-                (
+
                     isinstance(self.last_completed, datetime)
                     and self.last_completed.date() == today
-                )
+
             ):
                 return True
         except (AttributeError, TypeError):
@@ -464,7 +465,7 @@ class WeeklyChore(Chore):
         self._chore_days = config.get(const.CONF_CHORE_DAYS, [])
         self._period: int
         self._first_week: int
-        frequency = config.get(const.CONF_FREQUENCY)
+        config.get(const.CONF_FREQUENCY)
         self._period = config.get(const.CONF_PERIOD, 1)
         self._first_week = config.get(const.CONF_FIRST_WEEK, 1)
 
