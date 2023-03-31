@@ -107,6 +107,7 @@ OFFSET_DATE_SCHEMA = vol.Schema(
 )
 
 
+# pylint: disable=unused-argument
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up platform - register services, initialize data structure."""
 
