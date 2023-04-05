@@ -50,8 +50,7 @@ async def async_setup_entry(
         "blank": BlankChore,
     }
     if frequency in _frequency_function:
-        add_devices = _frequency_function[frequency]
-        async_add_devices([add_devices(config_entry)], True)
+        async_add_devices([_frequency_function[frequency](config_entry)], True)
     else:
         LOGGER.error("(%s) Unknown frequency %s", name, frequency)
         raise ValueError
@@ -79,6 +78,7 @@ class Chore(RestoreEntity):
         "_overdue",
         "_overdue_days",
         "_frequency",
+        "_start_date",
         "config_entry",
         "last_completed",
     )
@@ -119,6 +119,11 @@ class Chore(RestoreEntity):
         self._frequency: str = config.get(const.CONF_FREQUENCY)
         self._attr_state = self._days
         self._attr_icon = self._icon_normal
+        self._start_date: date | None
+        try:
+            self._start_date = helpers.to_date(config.get(const.CONF_START_DATE))
+        except ValueError:
+            self._start_date = None
 
     async def async_added_to_hass(self) -> None:
         """When sensor is added to HA, add it to calendar."""
@@ -147,6 +152,16 @@ class Chore(RestoreEntity):
                 if const.ATTR_LAST_COMPLETED in state.attributes
                 else None
             )
+            self._overdue = (
+                state.attributes[const.ATTR_OVERDUE]
+                if const.ATTR_OVERDUE in state.attributes
+                else False
+            )
+            self._overdue_days = (
+                state.attributes[const.ATTR_OVERDUE_DAYS]
+                if const.ATTR_OVERDUE_DAYS in state.attributes
+                else None
+            )
 
         # Create device
         device_registry = dr.async_get(self.hass)
@@ -173,7 +188,7 @@ class Chore(RestoreEntity):
             )
 
     async def async_will_remove_from_hass(self) -> None:
-        """When sensor is removed from HA, remove it."""
+        """When sensor is removed from HA, remove it and its calendar entity."""
         await super().async_will_remove_from_hass()
         del self.hass.data[const.DOMAIN][const.SENSOR_PLATFORM][self.entity_id]
         self.hass.data[const.DOMAIN][const.CALENDAR_PLATFORM].remove_entity(
@@ -234,10 +249,12 @@ class Chore(RestoreEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
-        state_attr = {
+        return {
             const.ATTR_DAYS: self._days,
             const.ATTR_LAST_COMPLETED: self.last_completed,
             const.ATTR_LAST_UPDATED: self._last_updated,
+            const.ATTR_OVERDUE: self._overdue,
+            const.ATTR_OVERDUE_DAYS: self._overdue_days,
             const.ATTR_NEXT_DATE: None
             if self._next_due_date is None
             else datetime(
@@ -248,7 +265,6 @@ class Chore(RestoreEntity):
             # Needed for translations to work
             ATTR_DEVICE_CLASS: self.DEVICE_CLASS,
         }
-        return state_attr
 
     @property
     def DEVICE_CLASS(self) -> str:  # pylint: disable=C0103
@@ -329,21 +345,21 @@ class Chore(RestoreEntity):
     ) -> Generator[date, None, None]:
         """Get dates within configured date range."""
         today = helpers.now().date()
-        first_date: date = date(today.year - 1, 1, 1) if date1 is None else date1
+        start_date: date = date(today.year - 1, 1, 1) if date1 is None else date1
         last_date: date = date(today.year + 1, 12, 31) if date2 is None else date2
-        first_date = self.move_to_range(first_date)
+        start_date = self.move_to_range(start_date)
         while True:
             try:
-                next_due_date = self._find_candidate_date(first_date)
+                next_due_date = self._find_candidate_date(start_date)
             except (TypeError, ValueError):
                 return
             if next_due_date is None or next_due_date > last_date:
                 return
             if (new_date := self.move_to_range(next_due_date)) != next_due_date:
-                first_date = new_date  # continue from next year
+                start_date = new_date  # continue from next year
             else:
                 yield next_due_date
-                first_date = next_due_date + relativedelta(
+                start_date = next_due_date + relativedelta(
                     days=1
                 )  # look from the next day
 
@@ -377,11 +393,11 @@ class Chore(RestoreEntity):
                 self.name,
             )
 
-    def get_next_due_date(self, first_date: date, ignore_today=False) -> date | None:
+    def get_next_due_date(self, start_date: date, ignore_today=False) -> date | None:
         """Get next date from self._due_dates."""
         current_date_time = helpers.now()
         for d in self._due_dates:  # pylint: disable=invalid-name
-            if d < first_date:
+            if d < start_date:
                 continue
             if not ignore_today and d == current_date_time.date():
                 expiration = time(23, 59, 59)
@@ -435,15 +451,13 @@ class Chore(RestoreEntity):
                 next_due_date_txt,
                 self._days,
             )
+            self._attr_state = self._days
             if self._days > 1:
-                self._attr_state = 2
                 self._attr_icon = self._icon_normal
             else:
                 if self._days == 0:
-                    self._attr_state = self._days
                     self._attr_icon = self._icon_today
                 elif self._days == 1:
-                    self._attr_state = self._days
                     self._attr_icon = self._icon_tomorrow
         else:
             self._days = None
@@ -469,6 +483,8 @@ class WeeklyChore(Chore):
 
     def _find_candidate_date(self, day1: date) -> date | None:
         """Calculate possible date, for weekly frequency."""
+        if self._start_date > day1:
+            day1 = self._start_date
         week = day1.isocalendar()[1]
         weekday = day1.weekday()
         offset = -1
@@ -492,31 +508,28 @@ class WeeklyChore(Chore):
 class DailyChore(Chore):
     """Chore every n days."""
 
-    __slots__ = "_first_date", "_period"
+    __slots__ = ("_period",)
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Read parameters specific for Daily Chore Frequency."""
         super().__init__(config_entry)
         config = config_entry.options
         self._period = config.get(const.CONF_PERIOD)
-        self._first_date: date | None
-        try:
-            self._first_date = helpers.to_date(config.get(const.CONF_FIRST_DATE))
-        except ValueError:
-            self._first_date = None
 
     def _find_candidate_date(self, day1: date) -> date | None:
         """Calculate possible date, for every-n-days frequency."""
+        if self._start_date > day1:
+            day1 = self._start_date
         try:
-            if (day1 - self._first_date).days % self._period == 0:  # type: ignore
+            if (day1 - self._start_date).days % self._period == 0:  # type: ignore
                 return day1
             offset = self._period - (
-                (day1 - self._first_date).days % self._period  # type: ignore
+                (day1 - self._start_date).days % self._period  # type: ignore
             )
         except TypeError as error:
             raise ValueError(
-                f"({self._attr_name}) Please configure first_date and period "
-                "for every-n-days chore frequency."
+                f"({self._attr_name}) Please configure start_date and period "
+                "for every-n-days or after-n-days chore frequency."
             ) from error
         return day1 + relativedelta(days=offset)
 
@@ -525,6 +538,7 @@ class MonthlyChore(Chore):
     """Chore every nth weekday of each month."""
 
     __slots__ = (
+        "_day_of_month",
         "_chore_days",
         "_monthly_force_week_numbers",
         "_period",
@@ -536,6 +550,7 @@ class MonthlyChore(Chore):
         """Read parameters specific for Monthly Chore Frequency."""
         super().__init__(config_entry)
         config = config_entry.options
+        self._day_of_month: int | None = config.get(const.CONF_DAY_OF_MONTH)
         self._chore_days = config.get(const.CONF_CHORE_DAYS, [])
         self._monthly_force_week_numbers = config.get(
             const.CONF_FORCE_WEEK_NUMBERS, False
@@ -552,6 +567,12 @@ class MonthlyChore(Chore):
             self._weekday_order_numbers = order_numbers
             self._week_order_numbers = []
         self._period = config.get(const.CONF_PERIOD, 1)
+
+        if self._day_of_month is None and len(self._chore_days) == 0:
+            raise ValueError(
+                f"({self._attr_name}) Please configure either day_of_month or "
+                "chore_days. day_of_month takes precedence if set."
+            )
 
     @staticmethod
     def nth_week_date(week_number: int, date_of_month: date, chore_day: int) -> date:
@@ -579,6 +600,14 @@ class MonthlyChore(Chore):
 
     def _monthly_candidate(self, day1: date) -> date:
         """Calculate possible date, for monthly frequency."""
+        if self._day_of_month is not None:
+            # day_of_month is today or in the future -> we have the date
+            if self._day_of_month >= day1.day:
+                return date(day1.year, day1.month, self._day_of_month)
+            # day_of_month is in the next month
+            if day1.month == 12:
+                return date(day1.year + 1, 1, self._day_of_month)
+            return date(day1.year, day1.month + 1, self._day_of_month)
         if self._monthly_force_week_numbers:
             for week_order_number in self._week_order_numbers:
                 candidate_date = MonthlyChore.nth_week_date(
@@ -614,21 +643,25 @@ class MonthlyChore(Chore):
         )
 
     def _find_candidate_date(self, day1: date) -> date | None:
+        if self._start_date > day1:
+            day1 = self._start_date
         if self._period is None or self._period == 1:
             return self._monthly_candidate(day1)
-        else:
-            candidate_date = self._monthly_candidate(day1)
-            while (candidate_date.month - self._first_month) % self._period != 0:
-                candidate_date = self._monthly_candidate(
-                    candidate_date + relativedelta(days=1)
-                )
-            return candidate_date
+        candidate_date = self._monthly_candidate(day1)
+        while (candidate_date.month - self._first_month) % self._period != 0:
+            candidate_date = self._monthly_candidate(
+                candidate_date + relativedelta(days=1)
+            )
+        return candidate_date
 
 
 class YearlyChore(Chore):
     """Chore every year."""
 
-    __slots__ = ("_date",)
+    __slots__ = (
+        "_period",
+        "_date",
+    )
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Read parameters specific for Yearly Chore Frequency."""
@@ -638,6 +671,8 @@ class YearlyChore(Chore):
 
     def _find_candidate_date(self, day1: date) -> date | None:
         """Calculate possible date, for yearly frequency."""
+        if self._start_date > day1:
+            day1 = self._start_date
         year = day1.year
         try:
             conf_date = datetime.strptime(self._date, "%m/%d").date()

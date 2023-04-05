@@ -153,6 +153,16 @@ async def detail_config_schema(
 
         if frequency in const.MONTHLY_FREQUENCY:
             options_schema[
+                optional(const.CONF_DAY_OF_MONTH, handler.options)
+            ] = selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=1,
+                    max=31,
+                    mode=selector.NumberSelectorMode.BOX,
+                )
+            )
+
+            options_schema[
                 optional(const.CONF_WEEKDAY_ORDER_NUMBER, handler.options)
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
@@ -167,7 +177,7 @@ async def detail_config_schema(
 
         if frequency in (const.WEEKLY_FREQUENCY + const.MONTHLY_FREQUENCY):
             options_schema[
-                required(const.CONF_CHORE_DAYS, handler.options)
+                optional(const.CONF_CHORE_DAYS, handler.options)
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=const.WEEKDAY_OPTIONS,
@@ -190,11 +200,6 @@ async def detail_config_schema(
                 )
             )
 
-        if frequency in const.DAILY_FREQUENCY:
-            options_schema[
-                required(const.CONF_FIRST_DATE, handler.options, helpers.now().date())
-            ] = selector.DateSelector()
-
         if frequency not in const.YEARLY_FREQUENCY:
             options_schema[
                 optional(
@@ -210,6 +215,10 @@ async def detail_config_schema(
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(options=const.MONTH_OPTIONS)
             )
+
+        options_schema[
+            required(const.CONF_START_DATE, handler.options, helpers.now().date())
+        ] = selector.DateSelector()
 
     return vol.Schema(options_schema)
 

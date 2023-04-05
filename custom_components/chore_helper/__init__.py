@@ -54,7 +54,7 @@ SENSOR_SCHEMA = vol.Schema(
         vol.Optional(const.CONF_FIRST_WEEK): vol.All(
             vol.Coerce(int), vol.Range(min=1, max=52)
         ),
-        vol.Optional(const.CONF_FIRST_DATE): cv.date,
+        vol.Optional(const.CONF_START_DATE): cv.date,
         vol.Optional(const.CONF_DATE_FORMAT): cv.string,
     },
     extra=vol.ALLOW_EXTRA,
