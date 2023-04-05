@@ -220,7 +220,7 @@ class Chore(RestoreEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return unit of measurement - None for numerical value."""
-        return "day(s)"
+        return "day" if self._days == 1 else "days"
 
     @property
     def native_value(self) -> object:
