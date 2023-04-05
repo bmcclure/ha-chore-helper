@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
+    ATTR_UNIT_OF_MEASUREMENT,
     ATTR_HIDDEN,
     CONF_NAME,
     WEEKDAYS,
@@ -202,6 +203,16 @@ class Chore(RestoreEntity):
         return self._next_due_date
 
     @property
+    def overdue(self) -> bool:
+        """Return overdue attribute."""
+        return self._overdue
+
+    @property
+    def overdue_days(self) -> int | None:
+        """Return overdue_days attribute."""
+        return self._overdue_days
+
+    @property
     def hidden(self) -> bool:
         """Return the hidden attribute."""
         return self._hidden
@@ -209,7 +220,7 @@ class Chore(RestoreEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return unit of measurement - None for numerical value."""
-        return None
+        return "day(s)"
 
     @property
     def native_value(self) -> object:
@@ -230,18 +241,12 @@ class Chore(RestoreEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
         return {
-            const.ATTR_DAYS: self._days,
             const.ATTR_LAST_COMPLETED: self.last_completed,
-            const.ATTR_LAST_UPDATED: self._last_updated,
-            const.ATTR_OVERDUE: self._overdue,
-            const.ATTR_OVERDUE_DAYS: self._overdue_days,
-            const.ATTR_NEXT_DATE: None
-            if self._next_due_date is None
-            else datetime(
-                self._next_due_date.year,
-                self._next_due_date.month,
-                self._next_due_date.day,
-            ).astimezone(),
+            const.ATTR_LAST_UPDATED: self.last_updated,
+            const.ATTR_OVERDUE: self.overdue,
+            const.ATTR_OVERDUE_DAYS: self.overdue_days,
+            const.ATTR_NEXT_DATE: self.next_due_date,
+            ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
             # Needed for translations to work
             ATTR_DEVICE_CLASS: self.DEVICE_CLASS,
         }
@@ -415,7 +420,10 @@ class Chore(RestoreEntity):
         LOGGER.debug("(%s) Looking for next chore date", self._attr_name)
         self._last_updated = helpers.now()
         today = self._last_updated.date()
-        self._next_due_date = self.get_next_due_date(today)
+        start = (
+            self.last_completed if self.last_completed is not None else self._start_date
+        )
+        self._next_due_date = self.get_next_due_date(start)
         if self._next_due_date is not None:
             LOGGER.debug(
                 "(%s) next_due_date (%s), today (%s)",
@@ -424,11 +432,10 @@ class Chore(RestoreEntity):
                 today,
             )
             self._days = (self._next_due_date - today).days
-            next_due_date_txt = self._next_due_date.strftime(self._date_format)
             LOGGER.debug(
                 "(%s) Found next chore date: %s, that is in %d days",
                 self._attr_name,
-                next_due_date_txt,
+                self._next_due_date,
                 self._days,
             )
             self._attr_state = self._days
@@ -439,10 +446,14 @@ class Chore(RestoreEntity):
                     self._attr_icon = self._icon_today
                 elif self._days == 1:
                     self._attr_icon = self._icon_tomorrow
+            self._overdue = self._days < 0
+            self._overdue_days = 0 if self._days > -1 else abs(self._days)
         else:
             self._days = None
             self._attr_state = None
             self._attr_icon = self._icon_normal
+            self._overdue = False
+            self._overdue_days = None
 
 
 class WeeklyChore(Chore):
