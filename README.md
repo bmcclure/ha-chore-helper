@@ -11,20 +11,22 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-This component allows you to set up and manage all of your recurring household chores in a flexible way using Home Assistant helpers.
+This component allows you to set up and manage all of your recurring household chores
+in a flexible way using Home Assistant helpers.
 
-Chore Helper is in its infancy and might not work well (or at all) for your use case. If you run into issues, let me know!
+Chore Helper is in its infancy and might not work well for your use case. But it
+desperately wants to, so let me know how you'd like to use it!
 
 **This component will set up the following platforms.**
 
-| Platform        | Description                                |
-| --------------- | ------------------------------------------ |
-| `helper`        | Create configuration for each chore        |
-| `sensor`        | Statistics for each chore                  |
-| `binary_sensor` | Binary statistics for each chore           |
-| `calendar`      | A Chores calendar for easy tracking        |
+| Platform   | Description                           |
+| ---------- | ------------------------------------- |
+| `sensor`   | Contains the state for a single chore |
+| `calendar` | A Chore calendar for easy tracking    |
 
-This helper is very loosely inspired by the way that the Tody app for Android works, except it is entirely managed within Home Assistant and benefits from the power of calendars, automations, and sensors.
+This helper is very loosely inspired by the way that the Tody app for Android works,
+except it is entirely managed within Home Assistant and benefits from the power of
+calendars, automations, and sensors.
 
 ## Installation
 
