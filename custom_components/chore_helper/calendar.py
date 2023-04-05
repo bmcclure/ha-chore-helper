@@ -1,5 +1,6 @@
 """Chore Helper calendar."""
 from __future__ import annotations
+import contextlib
 
 from datetime import datetime, timedelta
 
@@ -82,10 +83,8 @@ class EntitiesCalendarData:
 
     def remove_entity(self, entity_id: str) -> None:
         """Remove entity ID from the calendar."""
-        try:
+        with contextlib.suppress(ValueError):
             self.entities.remove(entity_id)
-        except ValueError:
-            pass
 
     async def async_get_events(
         self, hass: HomeAssistant, start_datetime: datetime, end_datetime: datetime
