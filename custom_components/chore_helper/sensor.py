@@ -163,15 +163,6 @@ class Chore(RestoreEntity):
                 else None
             )
 
-        # Create device
-        device_registry = dr.async_get(self.hass)
-        device_registry.async_get_or_create(
-            config_entry_id=self.config_entry.entry_id,
-            identifiers={(const.DOMAIN, self.unique_id)},
-            name=self._attr_name,
-            manufacturer="bmcclure",
-        )
-
         # Create or add to calendar
         if not self.hidden:
             if const.CALENDAR_PLATFORM not in self.hass.data[const.DOMAIN]:
@@ -201,15 +192,6 @@ class Chore(RestoreEntity):
         if "unique_id" in self.config_entry.data:  # From legacy config
             return self.config_entry.data["unique_id"]
         return self.config_entry.entry_id
-
-    @property
-    def device_info(self) -> DeviceInfo | None:
-        """Return device info."""
-        return {
-            "identifiers": {(const.DOMAIN, self.unique_id)},
-            "name": self.config_entry.data.get("name"),
-            "manufacturer": "bmcclure",
-        }
 
     @property
     def name(self) -> str | None:
