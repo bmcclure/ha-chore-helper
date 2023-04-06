@@ -626,16 +626,32 @@ class MonthlyChore(Chore):
             days=7 - first_of_month.weekday() + chore_day + (weekday_number - 1) * 7
         )
 
-    def _monthly_candidate(self, day1: date) -> date:
+    def _monthly_candidate(self, day1: date, schedule_start_date: date) -> date:
         """Calculate possible date, for monthly frequency."""
+        start_month = schedule_start_date.month
+        target_month = day1.month
+        target_year = day1.year
+        target_day = day1.day
+        if (
+            self.last_completed is not None
+            and self.last_completed.month == target_month
+        ):
+            target_month += 1
+            if target_month > 12:
+                target_month = 1
+                target_year += 1
+                target_day = 1
+            target_month = self.move_to_range(date(target_year, target_month, 1)).month
+        while (target_month - start_month) % self._period != 0:  # not the right month
+            target_month += 1
+            if target_month > 12:
+                target_month = 1
+                target_year += 1
+                target_day = 1
+            target_month = self.move_to_range(date(target_year, target_month, 1)).month
+        day1 = date(target_year, target_month, target_day)
         if self._day_of_month is not None:
-            # day_of_month is today or in the future -> we have the date
-            if self._day_of_month >= day1.day:
-                return date(day1.year, day1.month, self._day_of_month)
-            # day_of_month is in the next month
-            if day1.month == 12:
-                return date(day1.year + 1, 1, self._day_of_month)
-            return date(day1.year, day1.month + 1, self._day_of_month)
+            return date(target_year, target_month, self._day_of_month)
         if self._monthly_force_week_numbers:
             if self._week_order_number is not None:
                 candidate_date = MonthlyChore.nth_week_date(
@@ -671,14 +687,14 @@ class MonthlyChore(Chore):
         )
 
     def _find_candidate_date(self, day1: date) -> date | None:
-        if self._start_date > day1:
-            day1 = self._start_date
+        schedule_start_date = self._calculate_schedule_start_date()
+        day1 = self.calculate_day1(day1, schedule_start_date)
         if self._period is None or self._period == 1:
-            return self._monthly_candidate(day1)
-        candidate_date = self._monthly_candidate(day1)
+            return self._monthly_candidate(day1, schedule_start_date)
+        candidate_date = self._monthly_candidate(day1, schedule_start_date)
         while (candidate_date.month - self._first_month) % self._period != 0:
             candidate_date = self._monthly_candidate(
-                candidate_date + relativedelta(days=1)
+                candidate_date + relativedelta(days=1), schedule_start_date
             )
         return candidate_date
 
