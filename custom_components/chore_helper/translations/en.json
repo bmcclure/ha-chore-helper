@@ -26,7 +26,7 @@
                     "period": "Due every/after",
                     "first_week": "First due week (1-52)",
                     "start_date": "Start date",
-                    "day_of_month": "Day of month (required if not using weekdays)",
+                    "day_of_month": "Day of month",
                     "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
                     "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
                     "date_format": "Date format (see http://strftime.org/)"
@@ -76,7 +76,7 @@
                     "period": "Due every/after",
                     "first_week": "First due week (1-52)",
                     "start_date": "Start date",
-                    "day_of_month": "Day of month (required if not using weekdays)",
+                    "day_of_month": "Day of month",
                     "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
                     "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
                     "date_format": "Date format (see http://strftime.org/)"
