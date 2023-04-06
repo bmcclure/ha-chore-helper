@@ -181,7 +181,7 @@ async def detail_config_schema(
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=const.WEEKDAY_OPTIONS,
-                    multiple=(frequency in const.WEEKLY_FREQUENCY),
+                    multiple=True,
                     mode=selector.SelectSelectorMode.LIST,
                 )
             )
