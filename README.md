@@ -14,8 +14,8 @@
 This component allows you to set up and manage all of your recurring household chores
 in a flexible way using Home Assistant helpers.
 
-Chore Helper is in its infancy and might not work well for your use case. But it
-desperately wants to, so let me know how you'd like to use it!
+Chore Helper is in its infancy and might not work well for your use case yet. Let me
+know how it could be improved!
 
 **This component will set up the following platforms.**
 
