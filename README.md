@@ -76,7 +76,7 @@ That's where the "after" prefix comes in. With an "after" chore, once you've com
 
 ### Time Period Options
 
-The time periods are daily, weekly, monthly, yearly, and custom. All of the option except custom allow specifying a numeric period of the specified units (e.g. 7 days, 1 week, 6 months, etc...). The time periods other than yearly and custom can also be configured with starting and ending months each year. Custom chores do not schedule any due dates automatically, allowing you to call a service to schedule the next chore date however you'd like.
+The time periods are daily, weekly, monthly, yearly, and custom. All of the options except custom allow specifying a numeric period of the specified units (e.g. 7 days, 1 week, 6 months, etc...). The time periods other than yearly and custom can also be configured with starting and ending months each year. Custom chores do not schedule any due dates automatically, allowing you to call a service to schedule the next chore date however you'd like.
 
 Daily chores simply get scheduled to occur every day, or every N days.
 
