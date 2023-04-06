@@ -92,7 +92,7 @@ Yearly chores are scheduled to occur on a certain day and month each year, or ev
 
 ### Chore Attributes
 
-The main attribute for a chore is the number of days until (or since) the next due date. If the due date is in the future, the number will be positive. If the due date is in the past, the number will be negative. If the due date is today, the number will be 0. You can choose different icons for future chores, chores due tomorrow, chores due today, and overdue chores.
+The main state value for a chore is the number of days until (or since) the next due date. If the due date is in the future, the number will be positive. If the due date is in the past, the number will be negative. If the due date is today, the number will be 0. You can choose different icons for future chores, chores due tomorrow, chores due today, and overdue chores.
 
 The other attributes are the next due date, the last completed date, whether the chore is overdue, and the number of days overdue.
 
