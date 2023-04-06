@@ -70,7 +70,7 @@ Chores that use the "every" prefix are always scheduled based on your start date
 
 This is perfect for chores that depend on happening on certain days/weeks/months/years, but it's not ideal for many common chores. If you just cleaned the oven 3 days ago, but today is your scheduled oven cleaning day, you're likely not going to clean the oven again. If it's a monthly chore, then you probably aren't going to clean it for another month, right?
 
-That's where the "after" prefix comes in. With an "after" chore, once you've completed it at least one time, it's then always scheduled based on the date you last completed it. Let's take the same example from last time: you start a monthly chore in January and choose a period of 6 months. If you complete the chore in March, then your next due date will be in September, and not August.
+That's where the "after" prefix comes in. With an "after" chore, once you've completed it at least one time, it's then always scheduled based on the date you last completed it. Let's take the same example from last time: you start a monthly chore in January and choose a period of 6 months. If you complete the chore in March, then your next due date will be in September, and not July.
 
 "After" chores are perfect for most types of cleaning. Even cleaning chores that should only happen during certain seasons work well with "after" periods because you can choose starting and ending months that will always be in effect. For example, you could configure a chore to mow the lawn every 2 weeks on Saturday between the months of April and November, and the next chore will always be on the Saturday that occurs at least 2 weeks since you last mowed the lawn.
 
