@@ -167,6 +167,7 @@ async def detail_config_schema(
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=const.ORDER_OPTIONS,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             )
             options_schema[

@@ -585,7 +585,7 @@ class MonthlyChore(Chore):
         )
         self._weekday_order_number: int | None
         self._week_order_number: int | None
-        order_number: int | None
+        order_number: int = 1
         if const.CONF_WEEKDAY_ORDER_NUMBER in config:
             order_number = const.CONF_WEEKDAY_ORDER_NUMBER
         if self._monthly_force_week_numbers:
