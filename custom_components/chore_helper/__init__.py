@@ -199,7 +199,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.data[const.DOMAIN].setdefault(const.SENSOR_PLATFORM, {})
     hass.services.async_register(
         const.DOMAIN,
-        "complete_chore",
+        "complete",
         handle_complete_chore,
         schema=COMPLETE_NOW_SCHEMA,
     )

@@ -1,8 +1,9 @@
-complete_chore:
+complete:
   description: Set the last_completed attribute to the current date and time.
   target:
     entity:
       integration: chore_helper
+      domain: sensor
   fields:
     entity_id:
       description: The chore sensor entity_id
@@ -15,6 +16,7 @@ add_date:
   target:
     entity:
       integration: chore_helper
+      domain: sensor
   fields:
     entity_id:
       description: The chore_helper sensor entity_id
@@ -27,6 +29,7 @@ offset_date:
   target:
     entity:
       integration: chore_helper
+      domain: sensor
   fields:
     entity_id:
       description: The chore_helper sensor entity_id
@@ -42,6 +45,7 @@ remove_date:
   target:
     entity:
       integration: chore_helper
+      domain: sensor
   fields:
     entity_id:
       description: The chore_helper sensor entity_id
@@ -54,6 +58,7 @@ update_state:
   target:
     entity:
       integration: chore_helper
+      domain: sensor
   fields:
     entity_id:
       description: The chore sensor entity_id
