@@ -167,8 +167,6 @@ async def detail_config_schema(
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=const.ORDER_OPTIONS,
-                    multiple=True,
-                    mode=selector.SelectSelectorMode.LIST,
                 )
             )
             options_schema[
@@ -177,12 +175,10 @@ async def detail_config_schema(
 
         if frequency in (const.WEEKLY_FREQUENCY + const.MONTHLY_FREQUENCY):
             options_schema[
-                optional(const.CONF_CHORE_DAYS, handler.options)
+                optional(const.CONF_CHORE_DAY, handler.options)
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=const.WEEKDAY_OPTIONS,
-                    multiple=True,
-                    mode=selector.SelectSelectorMode.LIST,
                 )
             )
 

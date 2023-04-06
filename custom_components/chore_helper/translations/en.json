@@ -20,7 +20,7 @@
                 "data": {
                     "date": "Due date (mm/dd)",
                     "entities": "List of entities (comma separated)",
-                    "chore_days": "Due day(s)",
+                    "chore_day": "Due day",
                     "first_month": "First due month",
                     "last_month": "Last due month",
                     "period": "Due every/after",
@@ -70,7 +70,7 @@
                 "data": {
                     "date": "Due date (mm/dd)",
                     "entities": "List of entities (comma separated)",
-                    "chore_days": "Due day(s)",
+                    "chore_day": "Due day",
                     "first_month": "First due month",
                     "last_month": "Last due month",
                     "period": "Due every/after",

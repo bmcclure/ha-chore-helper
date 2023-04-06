@@ -40,13 +40,11 @@ SENSOR_SCHEMA = vol.Schema(
         vol.Optional(const.CONF_DATE): helpers.month_day_text,
         vol.Optional(const.CONF_TIME): cv.time,
         vol.Optional(CONF_ENTITIES): cv.entity_ids,
-        vol.Optional(const.CONF_CHORE_DAYS): vol.All(
-            cv.ensure_list, [vol.In(WEEKDAYS)]
-        ),
+        vol.Optional(const.CONF_CHORE_DAY): vol.In(WEEKDAYS),
         vol.Optional(const.CONF_FIRST_MONTH): vol.In(months),
         vol.Optional(const.CONF_LAST_MONTH): vol.In(months),
         vol.Optional(const.CONF_WEEKDAY_ORDER_NUMBER): vol.All(
-            cv.ensure_list, [vol.All(vol.Coerce(int), vol.Range(min=1, max=5))]
+            vol.Coerce(int), vol.Range(min=1, max=5)
         ),
         vol.Optional(const.CONF_PERIOD): vol.All(
             vol.Coerce(int), vol.Range(min=1, max=1000)
@@ -185,7 +183,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         entity_ids = call.data.get(CONF_ENTITY_ID, [])
         last_completed = call.data.get(const.ATTR_LAST_COMPLETED, helpers.now())
         for entity_id in entity_ids:
-            LOGGER.debug("called complete_chore for %s", entity_id)
+            LOGGER.debug("called complete for %s", entity_id)
             try:
                 entity = hass.data[const.DOMAIN][const.SENSOR_PLATFORM][entity_id]
                 entity.last_completed = dt_util.as_local(last_completed)
