@@ -541,7 +541,10 @@ class MonthlyChore(Chore):
         """Read parameters specific for Monthly Chore Frequency."""
         super().__init__(config_entry)
         config = config_entry.options
-        self._day_of_month: int | None = config.get(const.CONF_DAY_OF_MONTH)
+        day_of_month = config.get(const.CONF_DAY_OF_MONTH)
+        self._day_of_month: int | None = (
+            int(day_of_month) if day_of_month is not None else None
+        )
         self._chore_days = config.get(const.CONF_CHORE_DAYS, [])
         self._monthly_force_week_numbers = config.get(
             const.CONF_FORCE_WEEK_NUMBERS, False
