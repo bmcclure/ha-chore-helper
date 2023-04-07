@@ -5,12 +5,10 @@ https://github.com/bmcclure/ha-chore-helper
 """
 from __future__ import annotations
 
-import asyncio
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
-from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_HIDDEN,
