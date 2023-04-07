@@ -78,6 +78,9 @@ class Chore(RestoreEntity):
         "_overdue_days",
         "_frequency",
         "_start_date",
+        "_offset_dates",
+        "_add_dates",
+        "_remove_dates",
         "config_entry",
         "last_completed",
     )
@@ -119,13 +122,16 @@ class Chore(RestoreEntity):
         self._attr_state = self._days
         self._attr_icon = self._icon_normal
         self._start_date: date | None
+        self._offset_dates: str = None
+        self._add_dates: str = None
+        self._remove_dates: str = None
         try:
             self._start_date = helpers.to_date(config.get(const.CONF_START_DATE))
         except ValueError:
             self._start_date = None
 
     async def async_added_to_hass(self) -> None:
-        """When sensor is added to HA, add it to calendar."""
+        """When sensor is added to HA, restore state and add it to calendar."""
         await super().async_added_to_hass()
         self.hass.data[const.DOMAIN][const.SENSOR_PLATFORM][self.entity_id] = self
 
@@ -159,6 +165,21 @@ class Chore(RestoreEntity):
             self._overdue_days = (
                 state.attributes[const.ATTR_OVERDUE_DAYS]
                 if const.ATTR_OVERDUE_DAYS in state.attributes
+                else None
+            )
+            self._offset_dates = (
+                state.attributes[const.ATTR_OFFSET_DATES]
+                if const.ATTR_OFFSET_DATES in state.attributes
+                else None
+            )
+            self._add_dates = (
+                state.attributes[const.ATTR_ADD_DATES]
+                if const.ATTR_ADD_DATES in state.attributes
+                else None
+            )
+            self._remove_dates = (
+                state.attributes[const.ATTR_REMOVE_DATES]
+                if const.ATTR_REMOVE_DATES in state.attributes
                 else None
             )
 
@@ -213,6 +234,21 @@ class Chore(RestoreEntity):
         return self._overdue_days
 
     @property
+    def offset_dates(self) -> str:
+        """Return offset_dates attribute."""
+        return self._offset_dates
+
+    @property
+    def add_dates(self) -> str:
+        """Return add_dates attribute."""
+        return self._add_dates
+
+    @property
+    def remove_dates(self) -> str:
+        """Return remove_dates attribute."""
+        return self._remove_dates
+
+    @property
     def hidden(self) -> bool:
         """Return the hidden attribute."""
         return self._hidden
@@ -246,6 +282,9 @@ class Chore(RestoreEntity):
             const.ATTR_OVERDUE: self.overdue,
             const.ATTR_OVERDUE_DAYS: self.overdue_days,
             const.ATTR_NEXT_DATE: self.next_due_date,
+            const.ATTR_OFFSET_DATES: self.offset_dates,
+            const.ATTR_ADD_DATES: self.add_dates,
+            const.ATTR_REMOVE_DATES: self.remove_dates,
             ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
             # Needed for translations to work
             ATTR_DEVICE_CLASS: self.DEVICE_CLASS,
@@ -341,7 +380,7 @@ class Chore(RestoreEntity):
         return self.move_to_range(start_date)
 
     def _calculate_schedule_start_date(self) -> date:
-        """Calculate start date for schedule."""
+        """Calculate start date for scheduling offsets."""
         after = self._frequency[:6] == "after-"
         start_date = self._start_date
         if after and self.last_completed is not None:
@@ -359,46 +398,102 @@ class Chore(RestoreEntity):
             try:
                 next_due_date = self._find_candidate_date(start_date)
             except (TypeError, ValueError):
-                return
+                break
             if next_due_date is None or next_due_date > last_date:
-                return
+                break
             if (new_date := self.move_to_range(next_due_date)) != next_due_date:
                 start_date = new_date  # continue from next year
             else:
-                yield next_due_date
+                should_remove = False
+                if self._remove_dates is not None:
+                    for remove_date in self._remove_dates.split(" "):
+                        if remove_date == (next_due_date.strftime("%Y-%m-%d")):
+                            should_remove = True
+                            break
+                if not should_remove:
+                    offset = None
+                    if self._offset_dates is not None:
+                        offset_compare = next_due_date.strftime("%Y-%m-%d")
+                        for offset_date in self._offset_dates.split(" "):
+                            if offset_date.startswith(offset_compare):
+                                offset = int(offset_date.split(":")[1])
+                                break
+                    yield next_due_date if offset is None else next_due_date + relativedelta(
+                        days=offset
+                    )
                 start_date = next_due_date + relativedelta(
                     days=1
                 )  # look from the next day
+        if self._add_dates is not None:
+            for add_date_str in self._add_dates.split(" "):
+                yield datetime.strptime(add_date_str, "%Y-%m-%d").date()
+        return
 
     async def _async_load_due_dates(self) -> None:
         """Fill the chore dates list."""
         self._due_dates.clear()
         for chore_date in self.chore_schedule():
             self._due_dates.append(chore_date)
-        # self._due_dates.sort()
+        self._due_dates.sort()
 
     async def add_date(self, chore_date: date) -> None:
-        """Add date to _due_dates."""
-        if chore_date not in self._due_dates:
-            self._due_dates.append(chore_date)
-            self._due_dates.sort()
+        """Add date to due dates."""
+        add_dates = self._add_dates.split(" ") if self._add_dates else []
+        date_str = chore_date.strftime("%Y-%m-%d")
+        if date_str not in add_dates:
+            add_dates.append(date_str)
+            add_dates.sort()
+            self._add_dates = " ".join(add_dates)
         else:
             LOGGER.warning(
-                "%s not added to %s - already on the chore schedule",
+                "%s was already added to %s",
                 chore_date,
                 self.name,
             )
+        self.update_state()
 
-    async def remove_date(self, chore_date: date) -> None:
-        """Remove date from _chore dates."""
-        try:
-            self._due_dates.remove(chore_date)
-        except ValueError:
+    async def remove_date(self, chore_date: date | None = None) -> None:
+        """Remove date from chore dates."""
+        if chore_date is None:
+            chore_date = self.next_due_date
+        if chore_date is None:
+            LOGGER.warning("No date to remove from %s", self.name)
+            return
+        remove_dates = self._remove_dates.split(" ") if self._remove_dates else []
+        date_str = chore_date.strftime("%Y-%m-%d")
+        if date_str not in remove_dates:
+            remove_dates.append(date_str)
+            remove_dates.sort()
+            self._remove_dates = " ".join(remove_dates)
+        else:
             LOGGER.warning(
-                "%s not removed from %s - not in the chore schedule",
+                "%s was already removed from %s",
                 chore_date,
                 self.name,
             )
+        self.update_state()
+
+    async def offset_date(self, offset: int, chore_date: date | None = None) -> None:
+        """Offset date in chore dates."""
+        if chore_date is None:
+            chore_date = self.next_due_date
+        if chore_date is None:
+            LOGGER.warning("No date to offset from %s", self.name)
+            return
+        offset_dates = (
+            [
+                x
+                for x in self._offset_dates.split(" ")
+                if not x.startswith(chore_date.strftime("%Y-%m-%d"))
+            ]
+            if self._offset_dates is not None
+            else []
+        )
+        date_str = chore_date.strftime("%Y-%m-%d")
+        offset_dates.append(f"{date_str}:{offset}")
+        offset_dates.sort()
+        self._offset_dates = " ".join(offset_dates)
+        self.update_state()
 
     def get_next_due_date(self, start_date: date, ignore_today=False) -> date | None:
         """Get next date from self._due_dates."""
@@ -473,6 +568,33 @@ class Chore(RestoreEntity):
             self._attr_icon = self._icon_normal
             self._overdue = False
             self._overdue_days = None
+
+        start_date = self._calculate_start_date()
+        if self._add_dates is not None:
+            self._add_dates = " ".join(
+                [
+                    x
+                    for x in self._add_dates.split(" ")
+                    if datetime.strptime(x, "%Y-%m-%d").date() >= start_date
+                ]
+            )
+        if self._remove_dates is not None:
+            self._remove_dates = " ".join(
+                [
+                    x
+                    for x in self._remove_dates.split(" ")
+                    if datetime.strptime(x, "%Y-%m-%d").date() >= start_date
+                ]
+            )
+        if self._offset_dates is not None:
+            self._offset_dates = " ".join(
+                [
+                    x
+                    for x in self._offset_dates.split(" ")
+                    if datetime.strptime(x.split(":")[0], "%Y-%m-%d").date()
+                    >= start_date
+                ]
+            )
 
     def calculate_day1(self, day1: date, schedule_start_date: date) -> date:
         """Calculate day1."""
@@ -733,7 +855,6 @@ class BlankChore(Chore):
         """Get the latest data and updates the states."""
         if not await self._async_ready_for_update() or not self.hass.is_running:
             return
-
         LOGGER.debug("(%s) Calling update", self._attr_name)
         await self._async_load_due_dates()
         LOGGER.debug(

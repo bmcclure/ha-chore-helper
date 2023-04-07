@@ -6,7 +6,7 @@ https://github.com/bmcclure/ha-chore-helper
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
@@ -80,10 +80,17 @@ UPDATE_STATE_SCHEMA = vol.Schema(
     }
 )
 
-ADD_REMOVE_DATE_SCHEMA = vol.Schema(
+ADD_DATE_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.string]),
         vol.Required(const.CONF_DATE): cv.date,
+    }
+)
+
+REMOVE_DATE_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional(const.CONF_DATE): cv.date,
     }
 )
 
@@ -129,7 +136,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     async def handle_remove_date(call: ServiceCall) -> None:
         """Handle the remove_date service call."""
         entity_ids = call.data.get(CONF_ENTITY_ID, [])
-        chore_date = call.data.get(const.CONF_DATE)
+        chore_date = call.data.get(const.CONF_DATE, None)
         for entity_id in entity_ids:
             LOGGER.debug("called remove_date %s from %s", chore_date, entity_id)
             try:
@@ -147,7 +154,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         """Handle the offset_date service call."""
         entity_ids = call.data.get(CONF_ENTITY_ID, [])
         offset = call.data.get(const.CONF_OFFSET)
-        chore_date = call.data.get(const.CONF_DATE)
+        chore_date = call.data.get(const.CONF_DATE, None)
         for entity_id in entity_ids:
             LOGGER.debug(
                 "called offset_date %s by %d days for %s",
@@ -156,13 +163,8 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 entity_id,
             )
             try:
-                new_date = chore_date + relativedelta(
-                    days=offset
-                )  # pyright: reportOptionalOperand=false
                 entity = hass.data[const.DOMAIN][const.SENSOR_PLATFORM][entity_id]
-                await asyncio.gather(
-                    entity.remove_date(chore_date), entity.add_date(new_date)
-                )
+                await entity.offset_date(offset, chore_date)
             except (TypeError, KeyError) as err:
                 LOGGER.error("Failed offsetting date for %s - %s", entity_id, err)
                 break
@@ -208,13 +210,13 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         schema=UPDATE_STATE_SCHEMA,
     )
     hass.services.async_register(
-        const.DOMAIN, "add_date", handle_add_date, schema=ADD_REMOVE_DATE_SCHEMA
+        const.DOMAIN, "add_date", handle_add_date, schema=ADD_DATE_SCHEMA
     )
     hass.services.async_register(
         const.DOMAIN,
         "remove_date",
         handle_remove_date,
-        schema=ADD_REMOVE_DATE_SCHEMA,
+        schema=REMOVE_DATE_SCHEMA,
     )
     hass.services.async_register(
         const.DOMAIN, "offset_date", handle_offset_date, schema=OFFSET_DATE_SCHEMA
