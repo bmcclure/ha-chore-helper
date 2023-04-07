@@ -124,10 +124,16 @@ This service can be called to offset the next due date of a chore. This will onl
 | ---------------------- | -------- | ------------------------------------------------------------------------------- |
 | `entity_id`            | No       | The entity ID of the chore or chores to offset the due date of.                 |
 | `offset`               | No       | The number of days to offset the due date by. This can be positive or negative. |
+| `date`                 | Yes      | The date of the chore to offset, or the next due date if blank.                 |
 
-### chore_helper.skip
+### chore_helper.remove_date
 
-This service can be called to skip a chore. This skips the next due date, meaning your next due date will be scheduled as if you completed the chore on the skipped due date.
+This service can be called to remove a chore date (e.g. skip a chore). This removes the next due date if no date is passed. If a date is passed, it will remove the due date that matches the date passed. Even if no due date currently matches, the removal will persist so that if a due date is added that matches the date passed, it will be removed as well.
+
+| Service Data Attribute | Optional | Description                                                     |
+| ---------------------- | -------- | --------------------------------------------------------------- |
+| `entity_id`            | No       | The entity ID of the chore or chores to add a due date to.      |
+| `date`                 | Yes      | The date of the chore to remove, or the next due date if blank. |
 
 ### chore_helper.update_state
 
