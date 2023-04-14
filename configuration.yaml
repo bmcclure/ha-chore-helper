@@ -6,3 +6,6 @@ logger:
   default: info
   logs:
     custom_components.chore_helper: debug
+
+http:
+  server_port: 9123
