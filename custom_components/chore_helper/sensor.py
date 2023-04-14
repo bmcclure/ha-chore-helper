@@ -1,6 +1,7 @@
 """Sensor platform for chore_helper."""
 from __future__ import annotations
 
+from calendar import monthrange
 from datetime import date, datetime, time, timedelta
 from typing import Any
 from collections.abc import Generator
@@ -718,12 +719,6 @@ class MonthlyChore(Chore):
             self._week_order_number = None
         self._period = config.get(const.CONF_PERIOD, 1)
 
-        if self._day_of_month is None and self._chore_day is None:
-            raise ValueError(
-                f"({self._attr_name}) Please configure either day_of_month or "
-                "chore_day. day_of_month takes precedence if set."
-            )
-
     @staticmethod
     def nth_week_date(week_number: int, date_of_month: date, chore_day: int) -> date:
         """Find weekday in the nth week of the month."""
@@ -748,14 +743,23 @@ class MonthlyChore(Chore):
             days=7 - first_of_month.weekday() + chore_day + (weekday_number - 1) * 7
         )
 
-    def _monthly_candidate(self, day1: date) -> date:
+    def _monthly_candidate(self, day1: date, start_date: date) -> date:
         """Calculate possible date, for monthly frequency."""
-        if self._day_of_month is not None:
-            if day1.day <= self._day_of_month:
-                return date(day1.year, day1.month, self._day_of_month)
+        if self._chore_day is None:
+            day_of_month = self._day_of_month
+            if self._day_of_month is None:
+                month_range = monthrange(day1.year, day1.month)
+                day_of_month = (
+                    start_date.day
+                    if month_range[1] >= start_date.day
+                    else month_range[1]
+                )
+
+            if day1.day <= day_of_month:
+                return date(day1.year, day1.month, day_of_month)
             if day1.month == 12:
-                return date(day1.year + 1, 1, self._day_of_month)
-            return date(day1.year, day1.month + 1, self._day_of_month)
+                return date(day1.year + 1, 1, day_of_month)
+            return date(day1.year, day1.month + 1, day_of_month)
         if self._monthly_force_week_numbers:
             if self._week_order_number is not None:
                 candidate_date = MonthlyChore.nth_week_date(
@@ -799,11 +803,11 @@ class MonthlyChore(Chore):
             else:
                 day1 = date(day1.year, day1.month + 1, 1)
         if self._period is None or self._period == 1:
-            return self._monthly_candidate(day1)
-        candidate_date = self._monthly_candidate(day1)
+            return self._monthly_candidate(day1, schedule_start_date)
+        candidate_date = self._monthly_candidate(day1, schedule_start_date)
         while (candidate_date.month - schedule_start_date.month) % self._period != 0:
             candidate_date = self._monthly_candidate(
-                candidate_date + relativedelta(days=1)
+                candidate_date + relativedelta(days=1), schedule_start_date
             )
         return candidate_date
 
