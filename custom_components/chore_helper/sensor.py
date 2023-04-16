@@ -5,7 +5,6 @@ from calendar import monthrange
 from datetime import date, datetime, time, timedelta
 from typing import Any
 from collections.abc import Generator
-import itertools
 
 from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
@@ -397,20 +396,16 @@ class Chore(RestoreEntity):
 
     def chore_schedule(self) -> Generator[date, None, None]:
         """Get dates within configured date range."""
-        today = helpers.now().date()
         start_date: date = self._calculate_start_date()
-        last_date: date = date(today.year + 1, 12, 31)
-        for i in itertools.count():
-            if i > self._forecast_dates:
-                break
+        for _ in range(int(self._forecast_dates) + 1):
             try:
                 next_due_date = self._find_candidate_date(start_date)
             except (TypeError, ValueError):
                 break
-            if next_due_date is None or next_due_date > last_date:
+            if next_due_date is None:
                 break
             if (new_date := self.move_to_range(next_due_date)) != next_due_date:
-                start_date = new_date  # continue from next year
+                start_date = new_date
             else:
                 should_remove = False
                 if self._remove_dates is not None:
