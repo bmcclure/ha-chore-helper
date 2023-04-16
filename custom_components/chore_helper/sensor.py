@@ -703,7 +703,7 @@ class MonthlyChore(Chore):
         config = config_entry.options
         day_of_month = config.get(const.CONF_DAY_OF_MONTH)
         self._day_of_month: int | None = (
-            int(day_of_month) if day_of_month is not None else None
+            int(day_of_month) if day_of_month is not None and day_of_month > 0 else None
         )
         self._chore_day = config.get(const.CONF_CHORE_DAY, None)
         self._monthly_force_week_numbers = config.get(
@@ -827,8 +827,9 @@ class YearlyChore(Chore):
         """Read parameters specific for Yearly Chore Frequency."""
         super().__init__(config_entry)
         config = config_entry.options
-        self._period = config.get(const.CONF_PERIOD)
-        self._date = config.get(const.CONF_DATE)
+        self._period = config.get(const.CONF_PERIOD, 1)
+        due_date = config.get(const.CONF_DATE, None)
+        self._date = due_date if due_date is not None and due_date != "0" else None
 
     def _find_candidate_date(self, day1: date) -> date | None:
         """Calculate possible date, for yearly frequency."""

@@ -24,11 +24,26 @@ async def _validate_config(
     _: SchemaConfigFlowHandler | SchemaOptionsFlowHandler, data: Any
 ) -> Any:
     """Validate config."""
+    if const.CONF_DAY_OF_MONTH in data and data[const.CONF_DAY_OF_MONTH] < 1:
+        data[const.CONF_DAY_OF_MONTH] = None
+
     if const.CONF_DATE in data:
-        try:
-            helpers.month_day_text(data[const.CONF_DATE])
-        except vol.Invalid as exc:
-            raise SchemaFlowError("month_day") from exc
+        if data[const.CONF_DATE] == "0" or data[const.CONF_DATE] == "0/0":
+            data[const.CONF_DATE] = ""
+        else:
+            try:
+                helpers.month_day_text(data[const.CONF_DATE])
+            except vol.Invalid as exc:
+                raise SchemaFlowError("month_day") from exc
+
+    if (
+        const.CONF_WEEKDAY_ORDER_NUMBER in data
+        and int(data[const.CONF_WEEKDAY_ORDER_NUMBER]) < 1
+    ):
+        data[const.CONF_WEEKDAY_ORDER_NUMBER] = None
+
+    if const.CONF_CHORE_DAY in data and data[const.CONF_CHORE_DAY] == "0":
+        data[const.CONF_CHORE_DAY] = None
     return data
 
 
@@ -158,7 +173,7 @@ async def detail_config_schema(
                 optional(const.CONF_DAY_OF_MONTH, handler.options)
             ] = selector.NumberSelector(
                 selector.NumberSelectorConfig(
-                    min=1,
+                    min=0,
                     max=31,
                     mode=selector.NumberSelectorMode.BOX,
                 )

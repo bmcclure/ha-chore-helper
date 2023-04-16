@@ -86,6 +86,7 @@ YEARLY_FREQUENCY = ["every-n-years", "after-n-years"]
 BLANK_FREQUENCY = ["blank"]
 
 WEEKDAY_OPTIONS = [
+    selector.SelectOptionDict(value="0", label="None"),
     selector.SelectOptionDict(value="mon", label="Monday"),
     selector.SelectOptionDict(value="tue", label="Tuesday"),
     selector.SelectOptionDict(value="wed", label="Wednesday"),
@@ -111,6 +112,7 @@ MONTH_OPTIONS = [
 ]
 
 ORDER_OPTIONS = [
+    selector.SelectOptionDict(value="0", label="None"),
     selector.SelectOptionDict(value="1", label="1st"),
     selector.SelectOptionDict(value="2", label="2nd"),
     selector.SelectOptionDict(value="3", label="3rd"),
