@@ -5,6 +5,7 @@ from calendar import monthrange
 from datetime import date, datetime, time, timedelta
 from typing import Any
 from collections.abc import Generator
+import itertools
 
 from dateutil.relativedelta import relativedelta
 from homeassistant.config_entries import ConfigEntry
@@ -71,10 +72,12 @@ class Chore(RestoreEntity):
         "_icon_normal",
         "_icon_today",
         "_icon_tomorrow",
+        "_icon_overdue",
         "_last_month",
         "_last_updated",
         "_manual",
         "_next_due_date",
+        "_forecast_dates",
         "_overdue",
         "_overdue_days",
         "_frequency",
@@ -109,9 +112,11 @@ class Chore(RestoreEntity):
         self._icon_normal = config.get(const.CONF_ICON_NORMAL)
         self._icon_today = config.get(const.CONF_ICON_TODAY)
         self._icon_tomorrow = config.get(const.CONF_ICON_TOMORROW)
+        self._icon_overdue = config.get(const.CONF_ICON_OVERDUE)
         self._date_format = config.get(
             const.CONF_DATE_FORMAT, const.DEFAULT_DATE_FORMAT
         )
+        self._forecast_dates: int = config.get(const.CONF_FORECAST_DATES) or 0
         self._due_dates: list[date] = []
         self._next_due_date: date | None = None
         self._last_updated: datetime | None = None
@@ -395,7 +400,9 @@ class Chore(RestoreEntity):
         today = helpers.now().date()
         start_date: date = self._calculate_start_date()
         last_date: date = date(today.year + 1, 12, 31)
-        while True:
+        for i in itertools.count():
+            if i > self._forecast_dates:
+                break
             try:
                 next_due_date = self._find_candidate_date(start_date)
             except (TypeError, ValueError):
@@ -556,11 +563,12 @@ class Chore(RestoreEntity):
             self._attr_state = self._days
             if self._days > 1:
                 self._attr_icon = self._icon_normal
-            else:
-                if self._days == 0:
-                    self._attr_icon = self._icon_today
-                elif self._days == 1:
-                    self._attr_icon = self._icon_tomorrow
+            elif self._days < 0:
+                self._attr_icon = self._icon_overdue
+            elif self._days == 0:
+                self._attr_icon = self._icon_today
+            elif self._days == 1:
+                self._attr_icon = self._icon_tomorrow
             self._overdue = self._days < 0
             self._overdue_days = 0 if self._days > -1 else abs(self._days)
         else:

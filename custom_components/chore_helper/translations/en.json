@@ -11,7 +11,9 @@
                     "manual_update": "Manual update - sensor state updated manually by a service (Blueprint)",
                     "icon_normal": "Icon (mdi:broom) - optional",
                     "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
-                    "icon_today": "Icon due today (mdi:bell) - optional"
+                    "icon_today": "Icon due today (mdi:bell) - optional",
+                    "icon_overdue": "Icon overdue (mdi:bell-alert) - optional",
+                    "forecast_dates": "Number of future due dates to forecast"
                 }
             },
             "detail": {
@@ -61,7 +63,9 @@
                     "manual_update": "Manual update - sensor state updated manually by a service (Blueprint)",
                     "icon_normal": "Icon (mdi:broom) - optional",
                     "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
-                    "icon_today": "Icon due today (mdi:bell) - optional"
+                    "icon_today": "Icon due today (mdi:bell) - optional",
+                    "icon_overdue": "Icon overdue (mdi:bell-alert) - optional",
+                    "forecast_dates": "Number of future due dates to forecast"
                 }
             },
             "detail": {

@@ -58,57 +58,59 @@ def optional(
     return vol.Optional(key, description={"suggested_value": suggested_value})
 
 
+def general_schema_definition(
+    handler: SchemaConfigFlowHandler | SchemaOptionsFlowHandler,
+) -> Mapping[str, Any]:
+    """Create general schema."""
+    schema = {
+        required(
+            const.CONF_FREQUENCY, handler.options, const.DEFAULT_FREQUENCY
+        ): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=const.FREQUENCY_OPTIONS)
+        ),
+        optional(
+            const.CONF_ICON_NORMAL, handler.options, const.DEFAULT_ICON_NORMAL
+        ): selector.IconSelector(),
+        optional(
+            const.CONF_ICON_TOMORROW, handler.options, const.DEFAULT_ICON_TOMORROW
+        ): selector.IconSelector(),
+        optional(
+            const.CONF_ICON_TODAY, handler.options, const.DEFAULT_ICON_TODAY
+        ): selector.IconSelector(),
+        optional(
+            const.CONF_ICON_OVERDUE, handler.options, const.DEFAULT_ICON_OVERDUE
+        ): selector.IconSelector(),
+        optional(
+            const.CONF_FORECAST_DATES, handler.options, const.DEFAULT_FORECAST_DATES
+        ): selector.NumberSelector(
+            selector.NumberSelectorConfig(
+                min=0,
+                max=100,
+                mode=selector.NumberSelectorMode.BOX,
+                step=1,
+            )
+        ),
+        optional(ATTR_HIDDEN, handler.options, False): bool,
+        optional(const.CONF_MANUAL, handler.options, False): bool,
+    }
+
+    return schema
+
+
 async def general_config_schema(
     handler: SchemaConfigFlowHandler | SchemaOptionsFlowHandler,
 ) -> vol.Schema:
     """Generate config schema."""
-    return vol.Schema(
-        {
-            optional(CONF_NAME, handler.options): selector.TextSelector(),
-            required(
-                const.CONF_FREQUENCY, handler.options, const.DEFAULT_FREQUENCY
-            ): selector.SelectSelector(
-                selector.SelectSelectorConfig(options=const.FREQUENCY_OPTIONS)
-            ),
-            optional(
-                const.CONF_ICON_NORMAL, handler.options, const.DEFAULT_ICON_NORMAL
-            ): selector.IconSelector(),
-            optional(
-                const.CONF_ICON_TODAY, handler.options, const.DEFAULT_ICON_TODAY
-            ): selector.IconSelector(),
-            optional(
-                const.CONF_ICON_TOMORROW, handler.options, const.DEFAULT_ICON_TOMORROW
-            ): selector.IconSelector(),
-            optional(ATTR_HIDDEN, handler.options, False): bool,
-            optional(const.CONF_MANUAL, handler.options, False): bool,
-        }
-    )
+    schema_obj = {required(CONF_NAME, handler.options): selector.TextSelector()}
+    schema_obj.update(general_schema_definition(handler))
+    return vol.Schema(schema_obj)
 
 
 async def general_options_schema(
     handler: SchemaConfigFlowHandler | SchemaOptionsFlowHandler,
 ) -> vol.Schema:
     """Generate options schema."""
-    return vol.Schema(
-        {
-            required(
-                const.CONF_FREQUENCY, handler.options, const.DEFAULT_FREQUENCY
-            ): selector.SelectSelector(
-                selector.SelectSelectorConfig(options=const.FREQUENCY_OPTIONS)
-            ),
-            optional(
-                const.CONF_ICON_NORMAL, handler.options, const.DEFAULT_ICON_NORMAL
-            ): selector.IconSelector(),
-            optional(
-                const.CONF_ICON_TODAY, handler.options, const.DEFAULT_ICON_TODAY
-            ): selector.IconSelector(),
-            optional(
-                const.CONF_ICON_TOMORROW, handler.options, const.DEFAULT_ICON_TOMORROW
-            ): selector.IconSelector(),
-            optional(ATTR_HIDDEN, handler.options, False): bool,
-            optional(const.CONF_MANUAL, handler.options, False): bool,
-        }
-    )
+    return vol.Schema(general_schema_definition(handler))
 
 
 async def detail_config_schema(
