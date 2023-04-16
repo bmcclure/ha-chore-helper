@@ -28,8 +28,12 @@ async def _validate_config(
         data[const.CONF_DAY_OF_MONTH] = None
 
     if const.CONF_DATE in data:
-        if data[const.CONF_DATE] == "0" or data[const.CONF_DATE] == "0/0":
-            data[const.CONF_DATE] = ""
+        if (
+            data[const.CONF_DATE] == "0"
+            or data[const.CONF_DATE] == "0/0"
+            or data[const.CONF_DATE] == ""
+        ):
+            data[const.CONF_DATE] = None
         else:
             try:
                 helpers.month_day_text(data[const.CONF_DATE])

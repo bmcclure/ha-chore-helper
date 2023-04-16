@@ -836,7 +836,7 @@ class YearlyChore(Chore):
         start_date = self._calculate_schedule_start_date()
         day1 = self.calculate_day1(day1, start_date)
         conf_date = self._date
-        if conf_date is None:
+        if conf_date is None or conf_date == "":
             conf_date = start_date
         else:
             conf_date = datetime.strptime(conf_date, "%m/%d")
