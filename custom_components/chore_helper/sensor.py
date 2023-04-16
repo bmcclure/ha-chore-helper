@@ -824,22 +824,28 @@ class YearlyChore(Chore):
         """Read parameters specific for Yearly Chore Frequency."""
         super().__init__(config_entry)
         config = config_entry.options
+        self._period = config.get(const.CONF_PERIOD)
         self._date = config.get(const.CONF_DATE)
 
     def _find_candidate_date(self, day1: date) -> date | None:
         """Calculate possible date, for yearly frequency."""
-        if self._start_date > day1:
-            day1 = self._start_date
-        year = day1.year
-        try:
-            conf_date = datetime.strptime(self._date, "%m/%d").date()
-        except TypeError as error:
-            raise ValueError(
-                f"({self._attr_name}) Please configure the date "
-                "for yearly chore frequency."
-            ) from error
-        if (candidate_date := date(year, conf_date.month, conf_date.day)) < day1:
-            candidate_date = date(year + 1, conf_date.month, conf_date.day)
+        start_date = self._calculate_schedule_start_date()
+        day1 = self.calculate_day1(day1, start_date)
+        conf_date = self._date
+        if conf_date is None:
+            conf_date = start_date
+        candidate_date = date(day1.year, conf_date.month, conf_date.day)
+        if candidate_date < day1:
+            candidate_date = date(day1.year + 1, conf_date.month, conf_date.day)
+        difference = abs(candidate_date.year - start_date.year)
+        if difference > 0:
+            remainder = difference % self._period
+            if remainder != 0:
+                candidate_date = date(
+                    candidate_date.year + (self._period - remainder),
+                    candidate_date.month,
+                    candidate_date.day,
+                )
         return candidate_date
 
 
