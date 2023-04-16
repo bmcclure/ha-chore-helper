@@ -843,9 +843,9 @@ class YearlyChore(Chore):
         difference = abs(candidate_date.year - start_date.year)
         if difference > 0:
             remainder = difference % self._period
-            if remainder != 0:
+            if remainder > 0:
                 candidate_date = date(
-                    candidate_date.year + (self._period - remainder),
+                    int(candidate_date.year + (self._period - remainder)),
                     candidate_date.month,
                     candidate_date.day,
                 )
