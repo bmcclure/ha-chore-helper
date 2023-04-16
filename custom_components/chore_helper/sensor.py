@@ -837,6 +837,8 @@ class YearlyChore(Chore):
         conf_date = self._date
         if conf_date is None:
             conf_date = start_date
+        else:
+            conf_date = datetime.strptime(conf_date, "%m/%d")
         candidate_date = date(day1.year, conf_date.month, conf_date.day)
         if candidate_date < day1:
             candidate_date = date(day1.year + 1, conf_date.month, conf_date.day)
