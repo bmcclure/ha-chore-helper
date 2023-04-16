@@ -148,7 +148,7 @@ async def detail_config_schema(
 
         if frequency in const.YEARLY_FREQUENCY:
             options_schema[
-                required(const.CONF_DATE, handler.options)
+                optional(const.CONF_DATE, handler.options)
             ] = selector.TextSelector()
 
         if frequency in const.MONTHLY_FREQUENCY:
