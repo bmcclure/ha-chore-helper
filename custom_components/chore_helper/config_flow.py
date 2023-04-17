@@ -42,7 +42,7 @@ async def _validate_config(
 
     if (
         const.CONF_WEEKDAY_ORDER_NUMBER in data
-        and int(data[const.CONF_WEEKDAY_ORDER_NUMBER]) < 1
+        and int(data[const.CONF_WEEKDAY_ORDER_NUMBER]) == 0
     ):
         data[const.CONF_WEEKDAY_ORDER_NUMBER] = None
 

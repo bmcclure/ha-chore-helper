@@ -713,7 +713,7 @@ class MonthlyChore(Chore):
         self._week_order_number: int | None
         order_number: int = 1
         if const.CONF_WEEKDAY_ORDER_NUMBER in config:
-            order_number = const.CONF_WEEKDAY_ORDER_NUMBER
+            order_number = int(config[const.CONF_WEEKDAY_ORDER_NUMBER])
         if self._monthly_force_week_numbers:
             self._weekday_order_number = None
             self._week_order_number = order_number
@@ -723,11 +723,31 @@ class MonthlyChore(Chore):
         self._period = config.get(const.CONF_PERIOD, 1)
 
     @staticmethod
+    def viable_weeks_in_month(date_of_month: date, chore_day: int):
+        """Find the highest week number that contains the chore day in the month."""
+        first_of_month = date(date_of_month.year, date_of_month.month, 1)
+        last_of_month = first_of_month + relativedelta(day=31)
+        first_week = first_of_month.isocalendar()[1]
+        last_chore_day_offset = (last_of_month.weekday() - chore_day) % 7
+        last_chore_day = last_of_month - timedelta(days=last_chore_day_offset)
+        last_chore_week = last_chore_day.isocalendar()[1]
+        return last_chore_week - first_week + 1
+
+    @staticmethod
     def nth_week_date(week_number: int, date_of_month: date, chore_day: int) -> date:
         """Find weekday in the nth week of the month."""
         first_of_month = date(date_of_month.year, date_of_month.month, 1)
+        actual_week_number = (
+            week_number
+            if week_number > 0
+            else max(
+                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day) + week_number + 1,
+                1
+            )
+        )
+
         return first_of_month + relativedelta(
-            days=chore_day - first_of_month.weekday() + (week_number - 1) * 7
+            days=chore_day - first_of_month.weekday() + (actual_week_number - 1) * 7
         )
 
     @staticmethod
@@ -736,14 +756,23 @@ class MonthlyChore(Chore):
     ) -> date:
         """Find nth weekday of the month."""
         first_of_month = date(date_of_month.year, date_of_month.month, 1)
+        actual_weekday_number = (
+            weekday_number
+            if weekday_number > 0
+            else max(
+                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day) + weekday_number + 1,
+                1
+            )
+        )
+
         # 1st of the month is before the day of chore
         # (so 1st chore week the week when month starts)
         if chore_day >= first_of_month.weekday():
             return first_of_month + relativedelta(
-                days=chore_day - first_of_month.weekday() + (weekday_number - 1) * 7
+                days=chore_day - first_of_month.weekday() + (actual_weekday_number - 1) * 7
             )
         return first_of_month + relativedelta(
-            days=7 - first_of_month.weekday() + chore_day + (weekday_number - 1) * 7
+            days=7 - first_of_month.weekday() + chore_day + (actual_weekday_number - 1) * 7
         )
 
     def _monthly_candidate(self, day1: date, start_date: date) -> date:

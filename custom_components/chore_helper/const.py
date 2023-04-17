@@ -118,4 +118,8 @@ ORDER_OPTIONS = [
     selector.SelectOptionDict(value="3", label="3rd"),
     selector.SelectOptionDict(value="4", label="4th"),
     selector.SelectOptionDict(value="5", label="5th"),
+    selector.SelectOptionDict(value="-1", label="last"),
+    selector.SelectOptionDict(value="-2", label="2nd from last"),
+    selector.SelectOptionDict(value="-3", label="3rd from last"),
+    selector.SelectOptionDict(value="-4", label="4th from last"),
 ]
