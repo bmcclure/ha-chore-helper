@@ -793,7 +793,9 @@ class MonthlyChore(Chore):
 
     def _monthly_candidate(self, day1: date, start_date: date) -> tuple[date, int]:
         """Calculate possible date, for monthly frequency.
-        2nd value is the month to consider the date in, even if different."""
+
+        2nd value is the month to consider the date in, even if different.
+        """
         if self._chore_day is None:
             day_of_month = self._day_of_month
             if self._day_of_month is None:
