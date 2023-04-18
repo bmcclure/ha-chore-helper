@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from calendar import monthrange
 from datetime import date, datetime, time, timedelta
-from typing import Any, Tuple
+from typing import Any
 from collections.abc import Generator
 
 from dateutil.relativedelta import relativedelta
@@ -723,7 +723,11 @@ class MonthlyChore(Chore):
         self._period = config.get(const.CONF_PERIOD, 1)
 
     @staticmethod
-    def viable_weeks_in_month(date_of_month: date, chore_day: int, last_week_must_contain_chore_day: bool = False) -> int:
+    def viable_weeks_in_month(
+        date_of_month: date,
+        chore_day: int,
+        last_week_must_contain_chore_day: bool = False,
+    ) -> int:
         """Find the highest week number that contains the chore day in the month."""
         first_of_month = date(date_of_month.year, date_of_month.month, 1)
         last_of_month = first_of_month + relativedelta(day=31)
@@ -744,8 +748,10 @@ class MonthlyChore(Chore):
             week_number
             if week_number > 0
             else max(
-                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day, False) + week_number + 1,
-                1
+                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day, False)
+                + week_number
+                + 1,
+                1,
             )
         )
 
@@ -763,8 +769,10 @@ class MonthlyChore(Chore):
             weekday_number
             if weekday_number > 0
             else max(
-                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day, True) + weekday_number + 1,
-                1
+                MonthlyChore.viable_weeks_in_month(date_of_month, chore_day, True)
+                + weekday_number
+                + 1,
+                1,
             )
         )
 
@@ -772,15 +780,20 @@ class MonthlyChore(Chore):
         # (so 1st chore week the week when month starts)
         if chore_day >= first_of_month.weekday() or weekday_number < 0:
             return first_of_month + relativedelta(
-                days=chore_day - first_of_month.weekday() + (actual_weekday_number - 1) * 7
+                days=chore_day
+                - first_of_month.weekday()
+                + (actual_weekday_number - 1) * 7
             )
         return first_of_month + relativedelta(
-            days=7 - first_of_month.weekday() + chore_day + (actual_weekday_number - 1) * 7
+            days=7
+            - first_of_month.weekday()
+            + chore_day
+            + (actual_weekday_number - 1) * 7
         )
 
-    def _monthly_candidate(self, day1: date, start_date: date) -> Tuple[date, int]:
+    def _monthly_candidate(self, day1: date, start_date: date) -> tuple[date, int]:
         """Calculate possible date, for monthly frequency.
-            2nd value is the month to consider the date in, even if different."""
+        2nd value is the month to consider the date in, even if different."""
         if self._chore_day is None:
             day_of_month = self._day_of_month
             if self._day_of_month is None:
@@ -819,16 +832,22 @@ class MonthlyChore(Chore):
         else:
             next_chore_month = date(day1.year, day1.month + 1, 1)
         if self._monthly_force_week_numbers:
-            return (MonthlyChore.nth_week_date(
-                self._week_order_number,
+            return (
+                MonthlyChore.nth_week_date(
+                    self._week_order_number,
+                    next_chore_month,
+                    WEEKDAYS.index(self._chore_day),
+                ),
+                next_chore_month.month,
+            )
+        return (
+            MonthlyChore.nth_weekday_date(
+                self._weekday_order_number,
                 next_chore_month,
                 WEEKDAYS.index(self._chore_day),
-            ), next_chore_month.month)
-        return (MonthlyChore.nth_weekday_date(
-            self._weekday_order_number,
-            next_chore_month,
-            WEEKDAYS.index(self._chore_day),
-        ), next_chore_month.month)
+            ),
+            next_chore_month.month,
+        )
 
     def _find_candidate_date(self, day1: date) -> date | None:
         schedule_start_date = self._calculate_schedule_start_date()
@@ -844,9 +863,12 @@ class MonthlyChore(Chore):
         candidate_date = result[0]
         candidate_month = result[1]
         while (candidate_month - schedule_start_date.month) % self._period != 0:
-            remainder = (candidate_date.month - schedule_start_date.month) % self._period
+            remainder = (
+                candidate_date.month - schedule_start_date.month
+            ) % self._period
             result = self._monthly_candidate(
-                candidate_date + relativedelta(months=remainder, day=1), schedule_start_date
+                candidate_date + relativedelta(months=remainder, day=1),
+                schedule_start_date,
             )
             candidate_date = result[0]
             candidate_month = result[1]
