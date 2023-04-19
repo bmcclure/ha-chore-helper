@@ -191,9 +191,21 @@ async def detail_config_schema(
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             )
+
             options_schema[
                 optional(const.CONF_FORCE_WEEK_NUMBERS, handler.options)
             ] = selector.BooleanSelector()
+
+            options_schema[
+                optional(const.CONF_DUE_DATE_OFFSET, handler.options)
+            ] = selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=-7,
+                    max=7,
+                    mode=selector.NumberSelectorMode.SLIDER,
+                    unit_of_measurement="day(s)",
+                )
+            )
 
         if frequency in (const.WEEKLY_FREQUENCY + const.MONTHLY_FREQUENCY):
             options_schema[

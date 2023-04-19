@@ -695,6 +695,7 @@ class MonthlyChore(Chore):
         "_period",
         "_weekday_order_number",
         "_week_order_number",
+        "_due_date_offset",
     )
 
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -709,6 +710,7 @@ class MonthlyChore(Chore):
         self._monthly_force_week_numbers = config.get(
             const.CONF_FORCE_WEEK_NUMBERS, False
         )
+        self._due_date_offset = int(config.get(const.CONF_DUE_DATE_OFFSET, 0))
         self._weekday_order_number: int | None
         self._week_order_number: int | None
         order_number: int = 1
@@ -862,6 +864,7 @@ class MonthlyChore(Chore):
         if self._period is None or self._period == 1:
             return self._monthly_candidate(day1, schedule_start_date)[0]
         result = self._monthly_candidate(day1, schedule_start_date)
+
         candidate_date = result[0]
         candidate_month = result[1]
         while (candidate_month - schedule_start_date.month) % self._period != 0:
@@ -874,6 +877,10 @@ class MonthlyChore(Chore):
             )
             candidate_date = result[0]
             candidate_month = result[1]
+
+        if self._due_date_offset is not None:
+            candidate_date += timedelta(days=self._due_date_offset)
+
         return candidate_date
 
 
