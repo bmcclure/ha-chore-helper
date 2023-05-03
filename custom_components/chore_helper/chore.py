@@ -1,4 +1,4 @@
-"""An entity for a single chore"""
+"""An entity for a single chore."""
 from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta

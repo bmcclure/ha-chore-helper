@@ -1,4 +1,4 @@
-"""Sensor platform for chore_helper."""
+"""Entity for a monthly chore."""
 from __future__ import annotations
 
 from calendar import monthrange

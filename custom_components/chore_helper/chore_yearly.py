@@ -1,4 +1,4 @@
-"""Sensor platform for chore_helper."""
+"""Entity for a yearly chore."""
 from __future__ import annotations
 
 from datetime import date, datetime
