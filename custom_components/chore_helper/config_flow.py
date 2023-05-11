@@ -111,6 +111,11 @@ def general_schema_definition(
         ),
         optional(ATTR_HIDDEN, handler.options, False): bool,
         optional(const.CONF_MANUAL, handler.options, False): bool,
+        optional(
+            const.CONF_SHOW_OVERDUE_TODAY,
+            handler.options,
+            const.DEFAULT_SHOW_OVERDUE_TODAY,
+        ): bool,
     }
 
     return schema

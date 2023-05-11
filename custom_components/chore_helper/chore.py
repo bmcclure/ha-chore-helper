@@ -47,6 +47,7 @@ class Chore(RestoreEntity):
         "_offset_dates",
         "_add_dates",
         "_remove_dates",
+        "show_overdue_today",
         "config_entry",
         "last_completed",
     )
@@ -79,6 +80,9 @@ class Chore(RestoreEntity):
             const.CONF_DATE_FORMAT, const.DEFAULT_DATE_FORMAT
         )
         self._forecast_dates: int = config.get(const.CONF_FORECAST_DATES) or 0
+        self.show_overdue_today: bool = (
+            config.get(const.CONF_SHOW_OVERDUE_TODAY) or False
+        )
         self._due_dates: list[date] = []
         self._next_due_date: date | None = None
         self._last_updated: datetime | None = None

@@ -103,7 +103,11 @@ class EntitiesCalendarData:
                 continue
             chore = hass.data[DOMAIN][SENSOR_PLATFORM][entity]
             start = chore.get_next_due_date(start_date, True)
+            today = datetime.now().date()
             while start is not None and start_date <= start <= end_date:
+                if chore.show_overdue_today and (start < today):
+                    start = today
+
                 try:
                     end = start + timedelta(days=1)
                 except TypeError:

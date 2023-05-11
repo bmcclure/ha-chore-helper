@@ -28,6 +28,7 @@ DEVICE_CLASS = "chore_helper__schedule"
 CONF_SENSOR = "sensor"
 CONF_ENABLED = "enabled"
 CONF_FORECAST_DATES = "forecast_dates"
+CONF_SHOW_OVERDUE_TODAY = "show_overdue_today"
 CONF_FREQUENCY = "frequency"
 CONF_MANUAL = "manual_update"
 CONF_ICON_NORMAL = "icon_normal"
@@ -58,6 +59,7 @@ DEFAULT_PERIOD = 1
 DEFAULT_FIRST_WEEK = 1
 DEFAULT_DATE_FORMAT = "%b-%d-%Y"
 DEFAULT_FORECAST_DATES = 10
+DEFAULT_SHOW_OVERDUE_TODAY = False
 
 DEFAULT_ICON_NORMAL = "mdi:broom"
 DEFAULT_ICON_TODAY = "mdi:bell"
