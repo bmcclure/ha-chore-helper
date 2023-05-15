@@ -1,5 +1,5 @@
 colorlog==6.7.0
 homeassistant>=2023.5.0
-ruff==0.0.265
+ruff==0.0.267
 python-dateutil>=2.8.2
 types-python-dateutil>=2.8.18
