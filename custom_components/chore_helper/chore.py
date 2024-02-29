@@ -338,7 +338,7 @@ class Chore(RestoreEntity):
 
     def chore_schedule(self) -> Generator[date, None, None]:
         """Get dates within configured date range."""
-        start_date: date = self._calculate_start_date()
+        start_date: date = self._calculate_start_date() # 2024-02-28
         for _ in range(int(self._forecast_dates) + 1):
             try:
                 next_due_date = self._find_candidate_date(start_date)
@@ -480,8 +480,11 @@ class Chore(RestoreEntity):
     def update_state(self) -> None:
         """Pick the first event from chore dates, update attributes."""
         LOGGER.debug("(%s) Looking for next chore date", self._attr_name)
+        # 29.02.2024 00:07
         self._last_updated = helpers.now()
+        # 29.02.2024
         today = self._last_updated.date()
+        # 06.03.2024
         self._next_due_date = self.get_next_due_date(self._calculate_start_date())
         if self._next_due_date is not None:
             LOGGER.debug(
@@ -580,10 +583,11 @@ class Chore(RestoreEntity):
     def _calculate_schedule_start_date(self) -> date:
         """Calculate start date for scheduling offsets."""
 
-        after = self._frequency[:6] == "after-"
+        # after = self._frequency[:6] == "after-"
         start_date = self._start_date
 
-        if after and self.last_completed is not None:
+        # if after and self.last_completed is not None:
+        if self.last_completed is not None:
             earliest_date = self._add_period_offset(self.last_completed.date())
 
             if earliest_date > start_date:
