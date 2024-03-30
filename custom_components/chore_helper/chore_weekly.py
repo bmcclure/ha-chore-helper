@@ -40,7 +40,7 @@ class WeeklyChore(Chore):
         offset = -1
         if self._chore_day is not None:
             day_index = WEEKDAYS.index(self._chore_day)
-        else: # if chore day is not set, just repeat the start date's day
+        else:  # if chore day is not set, just repeat the start date's day
             day_index = start_date.weekday()
 
         if (week - start_week) % self._period == 0:  # Chore this week
