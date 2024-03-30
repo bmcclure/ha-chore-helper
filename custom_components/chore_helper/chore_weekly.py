@@ -38,12 +38,15 @@ class WeeklyChore(Chore):
         week = day1.isocalendar()[1]
         weekday = day1.weekday()
         offset = -1
+        if self._chore_day is not None:
+            day_index = WEEKDAYS.index(self._chore_day)
+        else: # if chore day is not set, just repeat the start date's day
+            day_index = start_date.weekday()
+
         if (week - start_week) % self._period == 0:  # Chore this week
-            if self._chore_day is not None:
-                day_index = WEEKDAYS.index(self._chore_day)
-                if day_index >= weekday:  # Chore still did not happen
-                    offset = day_index - weekday
-        iterate_by_week = 7 - weekday + WEEKDAYS.index(self._chore_day)
+            if day_index >= weekday:  # Chore still did not happen
+                offset = day_index - weekday
+        iterate_by_week = 7 - weekday + day_index
         while offset == -1:  # look in following weeks
             candidate = day1 + relativedelta(days=iterate_by_week)
             week = candidate.isocalendar()[1]
