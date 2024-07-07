@@ -136,7 +136,7 @@ class EntitiesCalendarData:
                     entity
                 ].next_due_date
         if len(next_due_dates) > 0:
-            entity_id = min(next_due_dates.keys(), key=(lambda k: next_due_dates[k]))
+            entity_id = min(next_due_dates.keys(), key=lambda k: next_due_dates[k])
             start = next_due_dates[entity_id]
             end = start + timedelta(days=1)
             name = self._hass.data[DOMAIN][SENSOR_PLATFORM][entity_id].name
