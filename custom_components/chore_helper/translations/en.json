@@ -104,5 +104,77 @@
             "first_week": "First week must be a number between 1 and 52",
             "date": "Invalid date format!"
         }
+    },
+    "services": {
+        "add_date": {
+            "name": "Add date",
+            "description": "Manually add chore date.",
+            "fields": {
+                "entity_id": {
+                    "name": "Entity ID",
+                    "description": "The chore sensor entity_id"
+                },
+                "date": {
+                    "name": "Date",
+                    "description": "Chore date to add."
+                }
+            }
+        },
+        "complete": {
+            "name": "Complete",
+            "description": "Set the last_completed attribute to the current date and time.",
+            "fields": {
+                "entity_id": {
+                    "name": "Entity ID",
+                    "description": "The chore sensor entity_id"
+                },
+                "last_completed": {
+                    "name": "Last completed",
+                    "description": "Date and time of the last chore completion (optional)."
+                }
+            }
+        },
+        "offset_date": {
+            "name": "Offset date",
+            "description": "Move the chore date by a number of days.",
+            "fields": {
+                "entity_id": {
+                    "name": "Entity ID",
+                    "description": "The chore sensor entity_id"
+                },
+                "date": {
+                    "name": "Date",
+                    "description": "Chore date to move."
+                },
+                "offset": {
+                    "name": "Offset",
+                    "description": "Number of days to move (negative number will move it back)."
+                }
+            }
+        },
+        "remove_date": {
+            "name": "Remove date",
+            "description": "Remove automatically calculated chore date.",
+            "fields": {
+                "entity_id": {
+                    "name": "Entity ID",
+                    "description": "The chore sensor entity_id"
+                },
+                "date": {
+                    "name": "Date",
+                    "description": "Chore date to remove."
+                }
+            }
+        },
+        "update_state": {
+            "name": "Update state",
+            "description": "Update the entity state and attributes. Used with the manual_update option, do defer the update after changing the automatically created schedule by automation triggered by the chore_helper_loaded event.",
+            "fields": {
+                "entity_id": {
+                    "name": "Entity ID",
+                    "description": "The chore sensor entity_id"
+                }
+            }
+        }
     }
 }

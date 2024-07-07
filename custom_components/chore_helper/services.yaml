@@ -6,10 +6,10 @@ complete:
       domain: sensor
   fields:
     entity_id:
-      description: The chore sensor entity_id
+      description: The chore sensor entity_id.
       example: sensor.sweep_floor
     last_completed:
-      description: Date and time of the last chore completion (optional)
+      description: Date and time of the last chore completion (optional).
       example: "2020-08-16 10:54:00"
 add_date:
   description: Manually add chore date.
@@ -19,10 +19,10 @@ add_date:
       domain: sensor
   fields:
     entity_id:
-      description: The chore_helper sensor entity_id
+      description: The chore_helper sensor entity_id.
       example: sensor.sweep_floor
     date:
-      description: Chore date to add
+      description: Chore date to add.
       example: '"2020-08-16"'
 offset_date:
   description: Move the chore date by a number of days.
@@ -32,13 +32,13 @@ offset_date:
       domain: sensor
   fields:
     entity_id:
-      description: The chore_helper sensor entity_id
+      description: The chore_helper sensor entity_id.
       example: sensor.sweep_floor
     date:
-      description: Collection date to move
+      description: Collection date to move.
       example: '"2020-08-16"'
     offset:
-      description: Number of days to move (negative number will move it back)
+      description: Number of days to move (negative number will move it back).
       example: 1
 remove_date:
   description: Remove automatically calculated chore date.
@@ -48,10 +48,10 @@ remove_date:
       domain: sensor
   fields:
     entity_id:
-      description: The chore_helper sensor entity_id
+      description: The chore_helper sensor entity_id.
       example: sensor.sweep_floor
     date:
-      description: Chore date to remove
+      description: Chore date to remove.
       example: '"2020-08-16"'
 update_state:
   description: Update the entity state and attributes. Used with the manual_update option, do defer the update after changing the automatically created schedule by automation triggered by the chore_helper_loaded event.
@@ -61,5 +61,5 @@ update_state:
       domain: sensor
   fields:
     entity_id:
-      description: The chore sensor entity_id
+      description: The chore sensor entity_id.
       example: sensor.sweep_floor
