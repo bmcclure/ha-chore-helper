@@ -1,4 +1,5 @@
 """An entity for a single chore."""
+
 from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta
@@ -111,11 +112,7 @@ class Chore(RestoreEntity):
         if (state := await self.async_get_last_state()) is not None:
             self._last_updated = None  # Unblock update - after options change
             self._attr_state = state.state
-            self._days = (
-                state.attributes[const.ATTR_DAYS]
-                if const.ATTR_DAYS in state.attributes
-                else None
-            )
+            self._days = state.attributes.get(const.ATTR_DAYS, None)
             next_due_date = (
                 helpers.parse_datetime(state.attributes[const.ATTR_NEXT_DATE])
                 if const.ATTR_NEXT_DATE in state.attributes
@@ -129,38 +126,18 @@ class Chore(RestoreEntity):
                 if const.ATTR_LAST_COMPLETED in state.attributes
                 else None
             )
-            self._overdue = (
-                state.attributes[const.ATTR_OVERDUE]
-                if const.ATTR_OVERDUE in state.attributes
-                else False
-            )
-            self._overdue_days = (
-                state.attributes[const.ATTR_OVERDUE_DAYS]
-                if const.ATTR_OVERDUE_DAYS in state.attributes
-                else None
-            )
-            self._offset_dates = (
-                state.attributes[const.ATTR_OFFSET_DATES]
-                if const.ATTR_OFFSET_DATES in state.attributes
-                else None
-            )
-            self._add_dates = (
-                state.attributes[const.ATTR_ADD_DATES]
-                if const.ATTR_ADD_DATES in state.attributes
-                else None
-            )
-            self._remove_dates = (
-                state.attributes[const.ATTR_REMOVE_DATES]
-                if const.ATTR_REMOVE_DATES in state.attributes
-                else None
-            )
+            self._overdue = state.attributes.get(const.ATTR_OVERDUE, False)
+            self._overdue_days = state.attributes.get(const.ATTR_OVERDUE_DAYS, None)
+            self._offset_dates = state.attributes.get(const.ATTR_OFFSET_DATES, None)
+            self._add_dates = state.attributes.get(const.ATTR_ADD_DATES, None)
+            self._remove_dates = state.attributes.get(const.ATTR_REMOVE_DATES, None)
 
         # Create or add to calendar
         if not self.hidden:
             if const.CALENDAR_PLATFORM not in self.hass.data[const.DOMAIN]:
-                self.hass.data[const.DOMAIN][
-                    const.CALENDAR_PLATFORM
-                ] = EntitiesCalendarData(self.hass)
+                self.hass.data[const.DOMAIN][const.CALENDAR_PLATFORM] = (
+                    EntitiesCalendarData(self.hass)
+                )
                 LOGGER.debug("Creating chore calendar")
                 await self.hass.config_entries.async_forward_entry_setup(
                     self.config_entry, const.CALENDAR_PLATFORM
@@ -363,8 +340,10 @@ class Chore(RestoreEntity):
                             if offset_date.startswith(offset_compare):
                                 offset = int(offset_date.split(":")[1])
                                 break
-                    yield next_due_date if offset is None else next_due_date + relativedelta(
-                        days=offset
+                    yield (
+                        next_due_date
+                        if offset is None
+                        else next_due_date + relativedelta(days=offset)
                     )
                 start_date = next_due_date + relativedelta(
                     days=1
