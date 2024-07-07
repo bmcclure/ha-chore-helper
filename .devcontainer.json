@@ -1,7 +1,7 @@
 {
 	"name": "ludeeus/integration_blueprint",
-	"image": "mcr.microsoft.com/vscode/devcontainers/python:0-3.10-bullseye",
-	"postCreateCommand": "scripts/setup",
+	"image": "mcr.microsoft.com/devcontainers/python:3.12-bullseye",
+	"postCreateCommand": "scripts/init",
 	"forwardPorts": [
 		8123
 	],
@@ -23,7 +23,8 @@
 				"yzhang.markdown-all-in-one",
 				"christian-kohler.path-intellisense",
 				"ms-python.black-formatter",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"DmitryDorofeev.empty-indent"
 			],
 			"settings": {
 				"files.eol": "\n",
