@@ -19,6 +19,8 @@ from . import const, helpers
 from .const import LOGGER
 from .calendar import EntitiesCalendarData
 
+PLATFORMS: list[str] = [const.CALENDAR_PLATFORM]
+
 
 class Chore(RestoreEntity):
     """Chore Sensor class."""
@@ -139,8 +141,8 @@ class Chore(RestoreEntity):
                     EntitiesCalendarData(self.hass)
                 )
                 LOGGER.debug("Creating chore calendar")
-                await self.hass.config_entries.async_forward_entry_setup(
-                    self.config_entry, const.CALENDAR_PLATFORM
+                await self.hass.config_entries.async_forward_entry_setups(
+                    self.config_entry, PLATFORMS
                 )
 
             self.hass.data[const.DOMAIN][const.CALENDAR_PLATFORM].add_entity(
