@@ -1,4 +1,5 @@
 """Entity for a manually-scheduled chore."""
+
 from __future__ import annotations
 
 from datetime import date

@@ -1,4 +1,5 @@
 """Sensor platform for chore_helper."""
+
 from __future__ import annotations
 
 from datetime import timedelta

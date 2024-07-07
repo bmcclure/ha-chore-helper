@@ -1,4 +1,5 @@
 """Set of functions to handle date and text conversion."""
+
 # Borrowed from Garbage Collection integration.
 from __future__ import annotations
 

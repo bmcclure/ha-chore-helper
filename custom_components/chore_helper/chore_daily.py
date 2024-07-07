@@ -1,4 +1,5 @@
 """Entity for a daily chore."""
+
 from __future__ import annotations
 
 from datetime import date, timedelta

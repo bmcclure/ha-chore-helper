@@ -1,4 +1,5 @@
 """Constants for the Chore Helper integration."""
+
 from logging import Logger, getLogger
 
 from homeassistant.helpers import selector

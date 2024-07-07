@@ -3,6 +3,7 @@
 For more details about this integration, please refer to
 https://github.com/bmcclure/ha-chore-helper
 """
+
 from __future__ import annotations
 
 from datetime import timedelta

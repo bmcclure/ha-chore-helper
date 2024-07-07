@@ -1,4 +1,5 @@
 """Adds config flow for Chore Helper."""
+
 from __future__ import annotations
 
 # import uuid
@@ -161,30 +162,30 @@ async def detail_config_schema(
                 "after-n-months": "month(s)",
                 "after-n-years": "year(s)",
             }
-            options_schema[
-                required(const.CONF_PERIOD, handler.options)
-            ] = selector.NumberSelector(
-                selector.NumberSelectorConfig(
-                    min=1,
-                    max=1000,
-                    mode=selector.NumberSelectorMode.BOX,
-                    unit_of_measurement=uom[frequency],
+            options_schema[required(const.CONF_PERIOD, handler.options)] = (
+                selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1,
+                        max=1000,
+                        mode=selector.NumberSelectorMode.BOX,
+                        unit_of_measurement=uom[frequency],
+                    )
                 )
             )
 
         if frequency in const.YEARLY_FREQUENCY:
-            options_schema[
-                optional(const.CONF_DATE, handler.options)
-            ] = selector.TextSelector()
+            options_schema[optional(const.CONF_DATE, handler.options)] = (
+                selector.TextSelector()
+            )
 
         if frequency in const.MONTHLY_FREQUENCY:
-            options_schema[
-                optional(const.CONF_DAY_OF_MONTH, handler.options)
-            ] = selector.NumberSelector(
-                selector.NumberSelectorConfig(
-                    min=0,
-                    max=31,
-                    mode=selector.NumberSelectorMode.BOX,
+            options_schema[optional(const.CONF_DAY_OF_MONTH, handler.options)] = (
+                selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0,
+                        max=31,
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
                 )
             )
 
@@ -197,27 +198,27 @@ async def detail_config_schema(
                 )
             )
 
-            options_schema[
-                optional(const.CONF_FORCE_WEEK_NUMBERS, handler.options)
-            ] = selector.BooleanSelector()
+            options_schema[optional(const.CONF_FORCE_WEEK_NUMBERS, handler.options)] = (
+                selector.BooleanSelector()
+            )
 
-            options_schema[
-                optional(const.CONF_DUE_DATE_OFFSET, handler.options)
-            ] = selector.NumberSelector(
-                selector.NumberSelectorConfig(
-                    min=-7,
-                    max=7,
-                    mode=selector.NumberSelectorMode.SLIDER,
-                    unit_of_measurement="day(s)",
+            options_schema[optional(const.CONF_DUE_DATE_OFFSET, handler.options)] = (
+                selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=-7,
+                        max=7,
+                        mode=selector.NumberSelectorMode.SLIDER,
+                        unit_of_measurement="day(s)",
+                    )
                 )
             )
 
         if frequency in (const.WEEKLY_FREQUENCY + const.MONTHLY_FREQUENCY):
-            options_schema[
-                optional(const.CONF_CHORE_DAY, handler.options)
-            ] = selector.SelectSelector(
-                selector.SelectSelectorConfig(
-                    options=const.WEEKDAY_OPTIONS,
+            options_schema[optional(const.CONF_CHORE_DAY, handler.options)] = (
+                selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=const.WEEKDAY_OPTIONS,
+                    )
                 )
             )
 
