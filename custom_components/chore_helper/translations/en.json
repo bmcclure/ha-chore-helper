@@ -13,7 +13,8 @@
                     "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
                     "icon_today": "Icon due today (mdi:bell) - optional",
                     "icon_overdue": "Icon overdue (mdi:bell-alert) - optional",
-                    "forecast_dates": "Number of future due dates to forecast"
+                    "forecast_dates": "Number of future due dates to forecast",
+                    "show_overdue_today": "Show overdue chore today on calendar"
                 }
             },
             "detail": {
@@ -29,6 +30,7 @@
                     "first_week": "First due week (1-52)",
                     "start_date": "Start date",
                     "day_of_month": "Day of month",
+                    "due_date_offset": "Offset each due date",
                     "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
                     "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
                     "date_format": "Date format (see http://strftime.org/)"
@@ -65,7 +67,8 @@
                     "icon_tomorrow": "Icon due tomorrow (mdi:bell-outline) - optional",
                     "icon_today": "Icon due today (mdi:bell) - optional",
                     "icon_overdue": "Icon overdue (mdi:bell-alert) - optional",
-                    "forecast_dates": "Number of future due dates to forecast"
+                    "forecast_dates": "Number of future due dates to forecast",
+                    "show_overdue_today": "Show overdue chore today on calendar"
                 }
             },
             "detail": {
@@ -81,6 +84,7 @@
                     "first_week": "First due week (1-52)",
                     "start_date": "Start date",
                     "day_of_month": "Day of month",
+                    "due_date_offset": "Offset each due date",
                     "weekday_order_number": "Order of the weekday in the month (e.g. first Wednesday of the month)",
                     "force_week_order_numbers": "Order of week in a month instead of order of weekday (e.g. on Wednesday of the first week)",
                     "date_format": "Date format (see http://strftime.org/)"

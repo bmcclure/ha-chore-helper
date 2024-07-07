@@ -2,6 +2,8 @@
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
     "files.associations": {
         "*.yaml": "home-assistant"
     },
@@ -14,4 +16,7 @@
         "homeassistant",
         "relativedelta"
     ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
 }
