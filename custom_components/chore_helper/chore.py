@@ -532,6 +532,12 @@ class Chore(RestoreEntity):
             day1 = schedule_start_date
         today = helpers.now().date()
         if (
+            day1 == start_date
+            and self.last_completed is not None
+            and self.last_completed.date() == day1
+        ):
+            day1 = day1 + relativedelta(days=1)
+        if (
             day1 == today
             and self.last_completed is not None
             and self.last_completed.date() == today
