@@ -42,7 +42,7 @@ class WeeklyChore(Chore):
             if self._chore_day is not None:
                 day_index = WEEKDAYS.index(self._chore_day)
                 if day_index >= weekday:  # Chore still did not happen
-                    offset = day_index - weekday # 5
+                    offset = day_index - weekday
         iterate_by_week = 7 - weekday + WEEKDAYS.index(self._chore_day)
         while offset == -1:  # look in following weeks
             candidate = day1 + relativedelta(days=iterate_by_week)
