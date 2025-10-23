@@ -53,6 +53,10 @@ class Chore(RestoreEntity):
         "show_overdue_today",
         "config_entry",
         "last_completed",
+        "_allocation_mode",
+        "_assigned_people",
+        "_current_assignee",
+        "_last_completed_by",
     )
 
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -100,6 +104,12 @@ class Chore(RestoreEntity):
         self._offset_dates: str = None
         self._add_dates: str = None
         self._remove_dates: str = None
+        self._allocation_mode: str = config.get(
+            const.CONF_ALLOCATION_MODE, const.DEFAULT_ALLOCATION_MODE
+        )
+        self._assigned_people: str = config.get(const.CONF_ASSIGNED_PEOPLE, "")
+        self._current_assignee: str = config.get(const.CONF_CURRENT_ASSIGNEE, "")
+        self._last_completed_by: str | None = None
         try:
             self._start_date = helpers.to_date(config.get(const.CONF_START_DATE))
         except ValueError:
@@ -133,6 +143,12 @@ class Chore(RestoreEntity):
             self._offset_dates = state.attributes.get(const.ATTR_OFFSET_DATES, None)
             self._add_dates = state.attributes.get(const.ATTR_ADD_DATES, None)
             self._remove_dates = state.attributes.get(const.ATTR_REMOVE_DATES, None)
+            self._current_assignee = state.attributes.get(
+                const.ATTR_CURRENT_ASSIGNEE, self._current_assignee
+            )
+            self._last_completed_by = state.attributes.get(
+                const.ATTR_LAST_COMPLETED_BY, None
+            )
 
         # Create or add to calendar
         if not self.hidden:
@@ -205,6 +221,26 @@ class Chore(RestoreEntity):
         return self._hidden
 
     @property
+    def allocation_mode(self) -> str:
+        """Return the allocation mode."""
+        return self._allocation_mode
+
+    @property
+    def assigned_people(self) -> str:
+        """Return the assigned people."""
+        return self._assigned_people
+
+    @property
+    def current_assignee(self) -> str:
+        """Return the current assignee."""
+        return self._current_assignee
+
+    @property
+    def last_completed_by(self) -> str | None:
+        """Return who last completed the chore."""
+        return self._last_completed_by
+
+    @property
     def native_unit_of_measurement(self) -> str | None:
         """Return unit of measurement - None for numerical value."""
         return "day" if self._days == 1 else "days"
@@ -236,6 +272,10 @@ class Chore(RestoreEntity):
             const.ATTR_OFFSET_DATES: self.offset_dates,
             const.ATTR_ADD_DATES: self.add_dates,
             const.ATTR_REMOVE_DATES: self.remove_dates,
+            const.ATTR_ALLOCATION_MODE: self.allocation_mode,
+            const.ATTR_ASSIGNED_PEOPLE: self.assigned_people,
+            const.ATTR_CURRENT_ASSIGNEE: self.current_assignee,
+            const.ATTR_LAST_COMPLETED_BY: self.last_completed_by,
             ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
             # Needed for translations to work
             ATTR_DEVICE_CLASS: self.DEVICE_CLASS,

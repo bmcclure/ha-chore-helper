@@ -11,6 +11,9 @@ complete:
     last_completed:
       description: Date and time of the last chore completion (optional).
       example: "2020-08-16 10:54:00"
+    completed_by:
+      description: Person who completed the chore (optional). For alternating mode, automatically assigns to the next person.
+      example: "John"
 add_date:
   description: Manually add chore date.
   target:
@@ -63,3 +66,16 @@ update_state:
     entity_id:
       description: The chore sensor entity_id.
       example: sensor.sweep_floor
+assign_person:
+  description: Manually assign a chore to a specific person.
+  target:
+    entity:
+      integration: chore_helper
+      domain: sensor
+  fields:
+    entity_id:
+      description: The chore sensor entity_id.
+      example: sensor.sweep_floor
+    current_assignee:
+      description: Person to assign the chore to.
+      example: "John"

@@ -72,6 +72,7 @@ COMPLETE_NOW_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.string]),
         vol.Optional(const.ATTR_LAST_COMPLETED): cv.datetime,
+        vol.Optional(const.ATTR_COMPLETED_BY): cv.string,
     }
 )
 
@@ -109,6 +110,13 @@ OFFSET_DATE_SCHEMA = vol.Schema(
         vol.Required(const.CONF_OFFSET): vol.All(
             vol.Coerce(int), vol.Range(min=-31, max=31)
         ),
+    }
+)
+
+ASSIGN_PERSON_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.string]),
+        vol.Required(const.ATTR_CURRENT_ASSIGNEE): cv.string,
     }
 )
 
@@ -181,15 +189,64 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             except KeyError as err:
                 LOGGER.error("Failed updating state for %s - %s", entity_id, err)
 
+    async def handle_assign_person(call: ServiceCall) -> None:
+        """Handle the assign_person service call."""
+        entity_ids = call.data.get(CONF_ENTITY_ID, [])
+        person = call.data.get(const.ATTR_CURRENT_ASSIGNEE)
+        for entity_id in entity_ids:
+            LOGGER.debug("called assign_person for %s to %s", entity_id, person)
+            try:
+                entity = hass.data[const.DOMAIN][const.SENSOR_PLATFORM][entity_id]
+                entity._current_assignee = person
+                entity.update_state()
+            except KeyError as err:
+                LOGGER.error(
+                    "Failed assigning person for %s - %s", entity_id, err
+                )
+
     async def handle_complete_chore(call: ServiceCall) -> None:
         """Handle the complete_chore service call."""
         entity_ids = call.data.get(CONF_ENTITY_ID, [])
         last_completed = call.data.get(const.ATTR_LAST_COMPLETED, helpers.now())
+        completed_by = call.data.get(const.ATTR_COMPLETED_BY, None)
         for entity_id in entity_ids:
             LOGGER.debug("called complete for %s", entity_id)
             try:
                 entity = hass.data[const.DOMAIN][const.SENSOR_PLATFORM][entity_id]
                 entity.last_completed = dt_util.as_local(last_completed)
+
+                # Handle person allocation
+                if completed_by:
+                    entity._last_completed_by = completed_by
+
+                    # Handle alternating mode - switch to next person
+                    if entity.allocation_mode == "alternating":
+                        people_list = [
+                            p.strip()
+                            for p in entity.assigned_people.split(",")
+                            if p.strip()
+                        ]
+                        if people_list:
+                            try:
+                                current_index = people_list.index(completed_by)
+                                next_index = (current_index + 1) % len(people_list)
+                                entity._current_assignee = people_list[next_index]
+                                LOGGER.debug(
+                                    "Alternating chore %s from %s to %s",
+                                    entity_id,
+                                    completed_by,
+                                    entity._current_assignee,
+                                )
+                            except ValueError:
+                                # completed_by not in list, assign to first person
+                                entity._current_assignee = people_list[0]
+                                LOGGER.warning(
+                                    "%s not in assigned people for %s, assigning to %s",
+                                    completed_by,
+                                    entity_id,
+                                    people_list[0],
+                                )
+
                 entity.update_state()
             except KeyError as err:
                 LOGGER.error(
@@ -221,6 +278,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     )
     hass.services.async_register(
         const.DOMAIN, "offset_date", handle_offset_date, schema=OFFSET_DATE_SCHEMA
+    )
+    hass.services.async_register(
+        const.DOMAIN,
+        "assign_person",
+        handle_assign_person,
+        schema=ASSIGN_PERSON_SCHEMA,
     )
     return True
 

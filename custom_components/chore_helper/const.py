@@ -22,6 +22,11 @@ ATTR_OVERDUE_DAYS = "overdue_days"
 ATTR_OFFSET_DATES = "offset_dates"
 ATTR_ADD_DATES = "add_dates"
 ATTR_REMOVE_DATES = "remove_dates"
+ATTR_ALLOCATION_MODE = "allocation_mode"
+ATTR_ASSIGNED_PEOPLE = "assigned_people"
+ATTR_CURRENT_ASSIGNEE = "current_assignee"
+ATTR_LAST_COMPLETED_BY = "last_completed_by"
+ATTR_COMPLETED_BY = "completed_by"
 
 BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 DEVICE_CLASS = "chore_helper__schedule"
@@ -51,6 +56,9 @@ CONF_FIRST_WEEK = "first_week"
 CONF_START_DATE = "start_date"
 CONF_SENSORS = "sensors"
 CONF_DATE_FORMAT = "date_format"
+CONF_ALLOCATION_MODE = "allocation_mode"
+CONF_ASSIGNED_PEOPLE = "assigned_people"
+CONF_CURRENT_ASSIGNEE = "current_assignee"
 
 DEFAULT_NAME = DOMAIN
 DEFAULT_FIRST_MONTH = "jan"
@@ -61,6 +69,7 @@ DEFAULT_FIRST_WEEK = 1
 DEFAULT_DATE_FORMAT = "%b-%d-%Y"
 DEFAULT_FORECAST_DATES = 10
 DEFAULT_SHOW_OVERDUE_TODAY = False
+DEFAULT_ALLOCATION_MODE = "none"
 
 DEFAULT_ICON_NORMAL = "mdi:broom"
 DEFAULT_ICON_TODAY = "mdi:bell"
@@ -126,4 +135,11 @@ ORDER_OPTIONS = [
     selector.SelectOptionDict(value="-2", label="2nd from last"),
     selector.SelectOptionDict(value="-3", label="3rd from last"),
     selector.SelectOptionDict(value="-4", label="4th from last"),
+]
+
+ALLOCATION_MODE_OPTIONS = [
+    selector.SelectOptionDict(value="none", label="Not assigned"),
+    selector.SelectOptionDict(value="single", label="Single person"),
+    selector.SelectOptionDict(value="alternating", label="Alternating between people"),
+    selector.SelectOptionDict(value="shared", label="Shared (all people)"),
 ]

@@ -117,6 +117,23 @@ def general_schema_definition(
             handler.options,
             const.DEFAULT_SHOW_OVERDUE_TODAY,
         ): bool,
+        optional(
+            const.CONF_ALLOCATION_MODE,
+            handler.options,
+            const.DEFAULT_ALLOCATION_MODE,
+        ): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=const.ALLOCATION_MODE_OPTIONS)
+        ),
+        optional(const.CONF_ASSIGNED_PEOPLE, handler.options, ""): selector.TextSelector(
+            selector.TextSelectorConfig(
+                multiline=False,
+            )
+        ),
+        optional(const.CONF_CURRENT_ASSIGNEE, handler.options, ""): selector.TextSelector(
+            selector.TextSelectorConfig(
+                multiline=False,
+            )
+        ),
     }
 
     return schema
